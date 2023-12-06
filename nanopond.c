@@ -932,6 +932,7 @@ static void *run(void *targ)
 
 	return (void *)0;
 }
+
 #define GENOME_SIZE 4096
 
 void packGenome(struct Cell* cell, const char* filename) {
@@ -1043,7 +1044,7 @@ int main()
 			pond[x][y].generation = 0;
 			pond[x][y].energy = 0;
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i)
-				pond[x][y].genome[i] = packedGenome(pond[x][y], "genome.txt");
+				pond[x][y].genome[i] = packGenome(pond[x][y], "genome.txt");
 #ifdef USE_PTHREADS_COUNT
 			pthread_mutex_init(&(pond[x][y].lock),0);
 #endif
