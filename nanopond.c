@@ -255,7 +255,7 @@
 //#define USE_SDL 1
 
 /* Define this to use threads, and how many threads to create */
-#define USE_PTHREADS_COUNT 4
+// #define USE_PTHREADS_COUNT 4
 
 /* ----------------------------------------------------------------------- */
 
@@ -405,7 +405,7 @@ static void doReport(const uint64_t clock)
 	/* Look here to get the columns in the CSV output */
 	
 	/* The first five are here and are self-explanatory */
-	printf("%llu,%llu,%llu,%llu,%llu,%llu,%llu,%llu",
+	printf("%lu,%lu,%lu,%lu,%lu,%lu,%lu,%lu",
 		(uint64_t)clock,
 		(uint64_t)totalEnergy,
 		(uint64_t)totalActiveCells,
@@ -933,7 +933,7 @@ static void *run(void *targ)
  * @param argc Number of args
  * @param argv Argument array
  */
-int main(int argc,char **argv)
+int main()
 {
 	uintptr_t i,x,y;
 
