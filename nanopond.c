@@ -935,7 +935,7 @@ static void *run(void *targ)
 
 #define GENOME_SIZE 4096
 
-void packGenome(struct Cell* cell, const char* filename) {
+void packGenome(struct Cell cell, const char* filename) {
 	FILE* file = fopen(filename, "r");
 	if (file == NULL) {
 		printf("Failed to open file: %s\n", filename);
