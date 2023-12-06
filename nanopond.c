@@ -939,7 +939,7 @@ static void *run(void *targ)
  * @param argc Number of args
  * @param argv Argument array
  */
-int main(int argc,char **argv)
+int main()
 {
 	uintptr_t i,x,y;
 
