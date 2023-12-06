@@ -255,7 +255,7 @@
 // #define USE_SDL 1
 
 /* Define this to use threads, and how many threads to create */
-#define USE_PTHREADS_COUNT 4
+// #define USE_PTHREADS_COUNT 4
 
 /* ----------------------------------------------------------------------- */
 
