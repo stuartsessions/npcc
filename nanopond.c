@@ -962,7 +962,7 @@ void packGenome(struct Cell cell, const char* filename) {
 			bitIndex++;
 
 			if (bitIndex == sizeof(uintptr_t) * 8) {
-				cell->genome[genomeIndex] = packedValue;
+				cell.genome[genomeIndex] = packedValue;
 				genomeIndex++;
 				bitIndex = 0;
 				packedValue = 0;
@@ -971,7 +971,7 @@ void packGenome(struct Cell cell, const char* filename) {
 	}
 
 	if (bitIndex > 0) {
-		cell->genome[genomeIndex] = packedValue;
+		cell.genome[genomeIndex] = packedValue;
 	}
 }
 
@@ -1044,7 +1044,7 @@ int main()
 			pond[x][y].generation = 0;
 			pond[x][y].energy = 0;
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i)
-				pond[x][y].genome[i] = packGenome(pond[x][y], "genome.txt");
+				packGenome(pond[x][y], "genome.txt");
 #ifdef USE_PTHREADS_COUNT
 			pthread_mutex_init(&(pond[x][y].lock),0);
 #endif
