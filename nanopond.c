@@ -252,7 +252,7 @@
 /* Define this to use SDL. To use SDL, you must have SDL headers
  * available and you must link with the SDL library when you compile. */
 /* Comment this out to compile without SDL visualization support. */
-#define USE_SDL 1
+//#define USE_SDL 1
 
 /* Define this to use threads, and how many threads to create */
 #define USE_PTHREADS_COUNT 4
@@ -746,22 +746,16 @@ static void *run(void *targ)
 						facing = 0;
 						break;
 					case 0x1: /* FWD: Increment the pointer (wrap at end) */
-						if ((ptr_shiftPtr += 4) >= SYSWORD_BITS) {
-							if (++ptr_wordPtr >= POND_DEPTH_SYSWORDS)
-								ptr_wordPtr = 0;
-							ptr_shiftPtr = 0;
-						}
+					    ptr_shiftPtr = !(ptr_shiftPtr >= SYSWORD_BITS) * ptr_shiftPtr
+                            + 4*(ptr_shiftPtr + 4 < SYSWORD_BITS);
+                        ptr_wordPtr = (wordPtr++ < POND_DEPTH_SYSWORDS) * ptr_wordPtr
+                            + (wordPtr++ < POND_DEPTH_SYSWORDS);
 						break;
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
-						if (ptr_shiftPtr)
-							ptr_shiftPtr -= 4;
-						else {
-							if (ptr_wordPtr)
-								--ptr_wordPtr;
-							else ptr_wordPtr = POND_DEPTH_SYSWORDS - 1;
-							ptr_shiftPtr = SYSWORD_BITS - 4;
-						}
-						break;
+						ptr_shiftPtr = (!!ptr_shiftPtr && 0) * SYSWORD_BITS + ptr_shiftPtr - 4;
+                        ptr_wordPtr = (!!ptr_wordPtr && 0)*POND_DEPTH_SYSWORDS + ptr_wordPtr - 1;
+                        
+                        break;
 					case 0x3: /* INC: Increment the register */
 						reg = (reg + 1) & 0xf;
 						break;
