@@ -1,4 +1,4 @@
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c\n"
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
 #define BYTE_TO_BINARY(byte)  \
   (byte & 0x80 ? '1' : '0'), \
   (byte & 0x40 ? '1' : '0'), \
@@ -171,7 +171,7 @@ int main(int argc, char** argv) {
     }
     //fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1);
     //writeCell(file1, &c1);
-    
+    fclose(file1);
     return 0;
     }
 
