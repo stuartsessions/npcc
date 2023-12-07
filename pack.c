@@ -100,7 +100,6 @@ int main(int argc, char** argv) {
     fprintf(file, "Hello, world!\n");
 
     // Close the file
-    fclose(file);
 
     // Call the readCell function
     struct Cell cell;
