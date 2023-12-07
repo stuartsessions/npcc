@@ -132,7 +132,7 @@ static void writeCell(FILE *file, struct Cell *cell) {
 	fprintf(file,"\n");
 }
 int main(int argc, char** argv) {
-    FILE *file = fopen("file.txt", "w");
+    FILE *file = fopen("file.txt", "r");
     if (file == NULL) {
         printf("Failed to create the file.\n");
         return 1;
@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
     // Close the file
     fclose(file);
 
-    FILE *file1 = fopen("file.txt", "r");
+    FILE *file1 = fopen("file.txt", "w");
     if (file1 == NULL) {
         printf("Failed to create the file.\n");
         return 1;
