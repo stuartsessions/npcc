@@ -1,6 +1,5 @@
 
-#define POND_SIZE_X 800
-#define POND_SIZE_Y 600
+
 
 /* Depth of pond in four-bit codons -- this is the maximum
  * genome size. This *must* be a multiple of 16! */
