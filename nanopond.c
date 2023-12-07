@@ -252,7 +252,7 @@
 /* Define this to use SDL. To use SDL, you must have SDL headers
  * available and you must link with the SDL library when you compile. */
 /* Comment this out to compile without SDL visualization support. */
-//#define USE_SDL 1
+// #define USE_SDL 1
 
 /* Define this to use threads, and how many threads to create */
 // #define USE_PTHREADS_COUNT 4
@@ -317,7 +317,7 @@ static const uintptr_t BITS_IN_FOURBIT_WORD[16] = { 0,1,1,2,1,2,2,3,1,2,2,3,2,3,
  * Structure for a cell in the pond
  */
 struct Cell
-        {
+{
 	/* Globally unique cell ID */
 	uint64_t ID;
 	
@@ -752,62 +752,22 @@ static void *run(void *targ)
 						facing = 0;
 						break;
 					case 0x1: /* FWD: Increment the pointer (wrap at end) */
-				        ptr_shiftPtr = 
-                            (ptr_shiftPtr + 4) * (( ptr_shiftPtr + 4) < SYSWORD_BITS);
-
-                        /*
-                        ptr_wordPtr = 
-                            (ptr_wordPtr + !ptr_shiftPtr)
-                            *
-                            ((ptr_wordPtr + !ptr_shiftPtr) < POND_DEPTH_SYSWORDS);
-						*/
-                       
-                        ptr_wordPtr = 
-                           (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * ptr_wordPtr 
-                           + 
-                           (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * !ptr_shiftPtr;
-
-                        break;
+						if ((ptr_shiftPtr += 4) >= SYSWORD_BITS) {
+							if (++ptr_wordPtr >= POND_DEPTH_SYSWORDS)
+								ptr_wordPtr = 0;
+							ptr_shiftPtr = 0;
+						}
+						break;
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
-                        /*  
-                        if (ptr_shiftPtr)
-                        {
-                            ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                        }
-                        else
-                        {
-                            if (ptr_wordPtr)
-                                --ptr_wordPtr;
-                            else
-                            {
-                                ptr_wordPtr = POND_DEPTH_SYSWORDS - 1;
-                            }
-                            ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                        }
-                       */
-                        
-                        ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                      
-
-                       // This is where the error is, the fact that shiftptr is never 0,
-                       // and if it is it immediately get set to something else. 
-                       
-
-                        ptr_wordPtr = 
-                            ((ptr_wordPtr == 0 && ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS)) 
-                            +
-                            ptr_wordPtr - (ptr_shiftPtr==(SYSWORD_BITS-4));
-                        
-                        break;
+						if (ptr_shiftPtr)
+							ptr_shiftPtr -= 4;
+						else {
+							if (ptr_wordPtr)
+								--ptr_wordPtr;
+							else ptr_wordPtr = POND_DEPTH_SYSWORDS - 1;
+							ptr_shiftPtr = SYSWORD_BITS - 4;
+						}
+						break;
 					case 0x3: /* INC: Increment the register */
 						reg = (reg + 1) & 0xf;
 						break;
@@ -830,40 +790,16 @@ static void *run(void *targ)
 						outputBuf[ptr_wordPtr] |= reg << ptr_shiftPtr;
 						break;
 					case 0x9: /* LOOP: Jump forward to matching REP if register is zero */
-					    /*	
-                        if (reg) {
+						if (reg) {
 							if (loopStackPtr >= POND_DEPTH)
-                                stop = 1; // Stack overflow ends execution
+								stop = 1; /* Stack overflow ends execution */
 							else {
 								loopStack_wordPtr[loopStackPtr] = wordPtr;
 								loopStack_shiftPtr[loopStackPtr] = shiftPtr;
 								++loopStackPtr;
 							}
 						} else falseLoopDepth = 1;
-				        */
-                        
-                        stop = stop * !(reg && (loopStackPtr >= POND_DEPTH))                   
-                            +
-                            (reg && (loopStackPtr >= POND_DEPTH));
-                        
-                        loopStack_wordPtr[loopStackPtr] =
-                            loopStack_wordPtr[loopStackPtr] 
-                            * 
-                            (!reg || (loopStackPtr>=POND_DEPTH))
-                            +
-                            (wordPtr * (reg && (loopStackPtr<POND_DEPTH)));
-                        
-                        loopStack_shiftPtr[loopStackPtr] =
-                            loopStack_shiftPtr[loopStackPtr] 
-                            * 
-                            (!reg || (loopStackPtr>=POND_DEPTH))
-                            +
-                            (shiftPtr * (reg && (loopStackPtr<POND_DEPTH)));
-
-                        loopStackPtr = loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH));
-                        falseLoopDepth = !reg;
-                        
-                        break;
+						break;
 					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
 						if (loopStackPtr) {
 							--loopStackPtr;
