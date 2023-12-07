@@ -77,28 +77,28 @@ static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
 
 
 static struct Cell readCell(const char *genomeData) {
-    int genomeIndex = 0;
-    int bitIndex = 0;
+    uintptr_t wordPtr = 0;
+    uintptr_t shiftPtr = 0;
     uintptr_t packedValue = 0;
     struct Cell cell;
 
     for (int i = 0; genomeData[i] != '\0'; i++) {
         char character = genomeData[i];
         if (character == '0' || character == '1') {
-            packedValue |= (character - '0') << bitIndex;
-            bitIndex++;
+            packedValue |= (character - '0') << shiftPtr;
+            shiftPtr += 4;
 
-            if (bitIndex == sizeof(uintptr_t) * 8) {
-                cell.genome[genomeIndex] = packedValue;
-                genomeIndex++;
-                bitIndex = 0;
+            if (shiftPtr >= SYSWORD_BITS) {
+                cell.genome[wordPtr] = packedValue;
+                wordPtr++;
+                shiftPtr = 0;
                 packedValue = 0;
             }
         }
     }
 
-    if (bitIndex > 0) {
-        cell.genome[genomeIndex] = packedValue;
+    if (shiftPtr > 0) {
+        cell.genome[wordPtr] = packedValue;
     }
     return cell;
 }
@@ -160,7 +160,7 @@ int main(int argc, char** argv) {
    // for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         fprintf(file1, "%x", (unsigned int)pond[0][0].genome[i]);
     //}
-    fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1 ) ;
+    fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1);
     //writeCell(file1, &c1);
     
     return 0;
