@@ -112,7 +112,9 @@ int main(int argc, char** argv) {
     for(unsigned int i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
         cell.genome[i] = ~((uintptr_t)0);
     }
-
+    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
+        fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
+    }
     readCell(file, &cell);
 
     // Close the file
