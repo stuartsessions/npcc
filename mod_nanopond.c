@@ -610,7 +610,11 @@ static void *run(void *targ)
 		/* Increment clock and run reports periodically */
 		/* Clock is incremented at the start, so it starts at 1 */
 		++clock;
-		if ((threadNo == 0)&&(!(clock % REPORT_FREQUENCY))) {
+		if (clock == 1000000)
+        {
+            exitNow = 1;
+        }
+        if ((threadNo == 0)&&(!(clock % REPORT_FREQUENCY))) {
 			doReport(clock);
 			/* SDL display is also refreshed every REPORT_FREQUENCY */
 #ifdef USE_SDL
@@ -1008,8 +1012,8 @@ int main()
 	uintptr_t i,x,y;
 
 	/* Seed and init the random number generator */
-	prngState[0] = (uint64_t)time(NULL);
-	srand(time(NULL));
+	prngState[0] = 0; //(uint64_t)time(NULL);
+	srand(13);
 	prngState[1] = (uint64_t)rand();
 
 	/* Reset per-report stat counters */
