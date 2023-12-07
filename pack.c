@@ -91,7 +91,7 @@ static struct Cell readCell(const char *genomeData) {
     uintptr_t packedValue = 0;
     struct Cell cell;
 
-    for (int i = 0; genomeData[i] != '\n'; i++) {
+    for (int i = 0; genomeData[i] != '\0'; i++) {
         char character = genomeData[i];
         if (character == '0' || character == '1') {
             packedValue |= (character - '0') << shiftPtr;
@@ -154,6 +154,7 @@ int main(int argc, char** argv) {
                 printf("Failed to read the file.\n");
                 return 1;
             }
+            printf("%s", line); 
             pond[i][j] = readCell(line);
         }
     }
