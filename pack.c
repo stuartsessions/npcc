@@ -107,10 +107,10 @@ int main(int argc, char** argv) {
     cell.generation = 0;
     cell.energy = 0;
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS-1;++i){
-        cell.genome[i] = ~((uintptr_t)1);
+        cell.genome[i] = ~((uintptr_t)0);
     }
     for(unsigned int i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
-        cell.genome[i] = ~((uintptr_t)0);
+        cell.genome[i] = ~((uintptr_t)1);
     }
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
