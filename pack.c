@@ -113,7 +113,7 @@ static void writeCell(FILE *file, struct Cell *cell) {
 			 * a LOOP/REP pair that's always false. In any case, this
 			 * would always result in our *underestimating* the size of
 			 * the genome and would never result in an overestimation. */
-            buffer = bin(inst)
+            unsigned int buffer = bin(inst);
             fprintf(file, "%s", buffer);
 			if (inst == 0xf) { /* STOP */
 				if (++stopCount >= 4)
