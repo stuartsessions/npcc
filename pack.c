@@ -63,32 +63,31 @@ struct Cell
 static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
 
 static void readCell(FILE *file, struct Cell *cell) {
-    uintptr_t wordPtr, shiftPtr, inst, stopCount, i;
-
-    wordPtr = 0;
-    shiftPtr = 0;
-    stopCount = 0;
-    for (i = 0; i < POND_DEPTH; ++i) {
-        int value;
-        if (fscanf(file, "%x", &value) != 1) {
-            // Error reading instruction from file
-            break;
-        }
-        inst = value & 0xf;
-        cell->genome[wordPtr] |= (inst << shiftPtr);
-        if (inst == 0xf) { /* STOP */
-            if (++stopCount >= 4)
-                break;
-        } else
-            stopCount = 0;
-        if ((shiftPtr += 4) >= SYSWORD_BITS) {
-            if (++wordPtr >= POND_DEPTH_SYSWORDS) {
-                wordPtr = EXEC_START_WORD;
-                shiftPtr = EXEC_START_BIT;
-            } else
-                shiftPtr = 0;
-        }
-    }
+    uintptr_t wordPtr,shiftPtr,inst,stopCount,i;
+		wordPtr = 0;
+		shiftPtr = 0;
+		stopCount = 0;
+		for(i=0;i<POND_DEPTH;++i) {
+			inst = (cell->genome[wordPtr] >> shiftPtr) & 0xf;
+			/* Four STOP instructions in a row is considered the end.
+			 * The probability of this being wrong is *very* small, and
+			 * could only occur if you had four STOPs in a row inside
+			 * a LOOP/REP pair that's always false. In any case, this
+			 * would always result in our *underestimating* the size of
+			 * the genome and would never result in an overestimation. */
+			fprintf(file,"%x",(unsigned int)inst);
+			if (inst == 0xf) { /* STOP */
+				if (++stopCount >= 4)
+					break;
+			} else stopCount = 0;
+			if ((shiftPtr += 4) >= SYSWORD_BITS) {
+				if (++wordPtr >= POND_DEPTH_SYSWORDS) {
+					wordPtr = EXEC_START_WORD;
+					shiftPtr = EXEC_START_BIT;
+				} else shiftPtr = 0;
+			}
+		}
+	fprintf(file,"\n");
 }
 int main(int argc, char** argv) {
     FILE *file = fopen("file.txt", "w");
@@ -110,10 +109,10 @@ int main(int argc, char** argv) {
     cell.lineage = 0;
     cell.generation = 0;
     cell.energy = 0;
-    for(i=0;i<POND_DEPTH_SYSWORDS-1;++i){
+    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS-1;++i){
         cell.genome[i] = ~((uintptr_t)1);
     }
-    for(i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
+    for(unsigned int i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
         cell.genome[i] = ~((uintptr_t)0);
     }
     file = fopen("file.txt", "r");
