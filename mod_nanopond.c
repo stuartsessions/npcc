@@ -748,7 +748,7 @@ static void *run(void *targ)
 						facing = 0;
 						break;
 					case 0x1: /* FWD: Increment the pointer (wrap at end) */
-					    ptr_shiftPtr = 
+				        ptr_shiftPtr = 
                             (ptr_shiftPtr + 4) * (( ptr_shiftPtr + 4) < SYSWORD_BITS);
 
                         /*
@@ -758,7 +758,7 @@ static void *run(void *targ)
                             ((ptr_wordPtr + !ptr_shiftPtr) < POND_DEPTH_SYSWORDS);
 						*/
                        
-                       ptr_wordPtr = 
+                        ptr_wordPtr = 
                            (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * ptr_wordPtr 
                            + 
                            (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * !ptr_shiftPtr;
@@ -826,16 +826,40 @@ static void *run(void *targ)
 						outputBuf[ptr_wordPtr] |= reg << ptr_shiftPtr;
 						break;
 					case 0x9: /* LOOP: Jump forward to matching REP if register is zero */
-						if (reg) {
+					    /*	
+                        if (reg) {
 							if (loopStackPtr >= POND_DEPTH)
-								stop = 1; /* Stack overflow ends execution */
+                                stop = 1; // Stack overflow ends execution
 							else {
 								loopStack_wordPtr[loopStackPtr] = wordPtr;
 								loopStack_shiftPtr[loopStackPtr] = shiftPtr;
 								++loopStackPtr;
 							}
 						} else falseLoopDepth = 1;
-						break;
+				        */
+                        
+                        stop = stop * !(reg && (loopStackPtr >= POND_DEPTH))                   
+                            +
+                            (reg && (loopStackPtr >= POND_DEPTH));
+                        
+                        loopStack_wordPtr[loopStackPtr] =
+                            loopStack_wordPtr[loopStackPtr] 
+                            * 
+                            (!reg || (loopStackPtr>=POND_DEPTH))
+                            +
+                            (wordPtr * (reg && (loopStackPtr<POND_DEPTH)));
+                        
+                        loopStack_shiftPtr[loopStackPtr] =
+                            loopStack_shiftPtr[loopStackPtr] 
+                            * 
+                            (!reg || (loopStackPtr>=POND_DEPTH))
+                            +
+                            (shiftPtr * (reg && (loopStackPtr<POND_DEPTH)));
+
+                        loopStackPtr = loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH));
+                        falseLoopDepth = !reg;
+                        
+                        break;
 					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
 						if (loopStackPtr) {
 							--loopStackPtr;
