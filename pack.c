@@ -105,7 +105,17 @@ int main(int argc, char** argv) {
 
     // Call the readCell function
     struct Cell cell;
-    
+    cell.ID = 0;
+    cell.parentID = 0;
+    cell.lineage = 0;
+    cell.generation = 0;
+    cell.energy = 0;
+    for(i=0;i<POND_DEPTH_SYSWORDS-1;++i){
+        cell.genome[i] = ~((uintptr_t)1);
+    }
+    for(i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
+        cell.genome[i] = ~((uintptr_t)0);
+    }
     file = fopen("file.txt", "r");
     if (file == NULL) {
         printf("Failed to open the file.\n");
