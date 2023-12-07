@@ -100,12 +100,7 @@ int main(int argc, char** argv) {
     fprintf(file, "Hello, world!\n");
 
     // Call the readCell function
-    Cell cell;
-    cell.ID = 0;
-    cell.parentID = 0;
-    cell.lineage = 0;
-    cell.generation = 0;
-    cell.energy = 0;
+    Cell cell = {0,0,0,0,0};
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         cell.genome[i] = ~((uintptr_t)0);
     }
