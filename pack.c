@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     fprintf(file, "Hello, world!\n");
 
     // Call the readCell function
-    struct Cell cell;
+    Cell cell;
     cell.ID = 0;
     cell.parentID = 0;
     cell.lineage = 0;
@@ -109,9 +109,9 @@ int main(int argc, char** argv) {
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         cell.genome[i] = ~((uintptr_t)0);
     }
-    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
-        fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
-    }
+    //for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
+    //    fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
+   // }
     readCell(file, &cell);
 
     // Close the file
