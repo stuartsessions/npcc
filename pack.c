@@ -157,11 +157,12 @@ int main(int argc, char** argv) {
         printf("Failed to create the file.\n");
         return 1;
     }
-    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
+   // for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         fprintf(file1, "%x", (unsigned int)pond[0][0].genome[i]);
-    }
+    //}
+    fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1 ) ;
     //writeCell(file1, &c1);
-
+    
     return 0;
     }
 
