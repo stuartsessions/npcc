@@ -91,7 +91,7 @@ static struct Cell readCell(const char *genomeData) {
     uintptr_t packedValue = 0;
     struct Cell cell;
 
-    for (int i = 0; genomeData[i] != '\0'; i++) {
+    for (int i = 0; genomeData[i] != '\n'; i++) {
         char character = genomeData[i];
         if (character == '0' || character == '1') {
             packedValue |= (character - '0') << shiftPtr;
