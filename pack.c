@@ -31,6 +31,9 @@
 #define EXEC_START_WORD 0
 #define EXEC_START_BIT 4
 
+#define POND_SIZE_X 6
+#define POND_SIZE_Y 6
+
 /* Number of bits set in binary numbers 0000 through 1111 */
 static const uintptr_t BITS_IN_FOURBIT_WORD[16] = { 0,1,1,2,1,2,2,3,1,2,2,3,2,3,3,4 };
 
@@ -59,6 +62,9 @@ struct Cell
 	 * bit instructions packed into machine size words) */
 	uintptr_t genome[POND_DEPTH_SYSWORDS];
 };
+
+static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
+
 void bin(unsigned n)
 {
     unsigned i;
@@ -71,35 +77,30 @@ static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
 #define GENOME_SIZE 4096
 
 
-static struct Cell readCell(FILE *file){
-    char genomeData[GENOME_SIZE];
-	if (fgets(genomeData, GENOME_SIZE, file) == NULL) {
-		printf("Failed to read genome data from file\n");
-		fclose(file);
-		return;
-	}
+static struct Cell readCell(const char *genomeData) {
     int genomeIndex = 0;
-	int bitIndex = 0;
-	uintptr_t packedValue = 0;
-    struct Cell cell;   
-	for (int i = 0; genomeData[i] != '\0'; i++) {
-		char character = genomeData[i];
-		if (character == '0' || character == '1') {
-			packedValue |= (character - '0') << bitIndex;
-			bitIndex++;
+    int bitIndex = 0;
+    uintptr_t packedValue = 0;
+    struct Cell cell;
 
-			if (bitIndex == sizeof(uintptr_t) * 8) {
-				cell.genome[genomeIndex] = packedValue;
-				genomeIndex++;
-				bitIndex = 0;
-				packedValue = 0;
-			}
-		}
-	}
+    for (int i = 0; genomeData[i] != '\0'; i++) {
+        char character = genomeData[i];
+        if (character == '0' || character == '1') {
+            packedValue |= (character - '0') << bitIndex;
+            bitIndex++;
 
-	if (bitIndex > 0) {
-		cell.genome[genomeIndex] = packedValue;
-	}
+            if (bitIndex == sizeof(uintptr_t) * 8) {
+                cell.genome[genomeIndex] = packedValue;
+                genomeIndex++;
+                bitIndex = 0;
+                packedValue = 0;
+            }
+        }
+    }
+
+    if (bitIndex > 0) {
+        cell.genome[genomeIndex] = packedValue;
+    }
     return cell;
 }
 
@@ -134,28 +135,21 @@ static void writeCell(FILE *file, struct Cell *cell) {
 int main(int argc, char** argv) {
     FILE *file = fopen("file.txt", "r");
     if (file == NULL) {
-        printf("Failed to create the file.\n");
+        printf("Failed to open the file.\n");
         return 1;
     }
 
-    // Write data to the file
-    //fprintf(file, "Hello, world!\n");
-
-    // Call the readCell function
-    struct Cell cell;
-    cell.ID = 0;
-    cell.parentID = 0;
-    cell.lineage = 0;
-    cell.generation = 0;
-    cell.energy = 0;
-    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
-        cell.genome[i] = ~((uintptr_t)0);
+    for (int i = 0; i < POND_SIZE_X; i++) {
+        for (int j = 0; j < POND_SIZE_Y; j++) {
+            char line[GENOME_SIZE];
+            if (fgets(line, sizeof(line), file) == NULL) {
+                printf("Failed to read the file.\n");
+                return 1;
+            }
+            pond[i][j] = readCell(line);
+        }
     }
-
-    //    fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
-   // }
-    //writeCell(file, &cell);
-    struct Cell c1 = readCell(file);
+    
     // Close the file
     fclose(file);
 
@@ -165,7 +159,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
-        fprintf(file1, "%s", (unsigned int)c1.genome[i]);
+        fprintf(file1, "%x", (unsigned int)c1.genome[i]);
     }
     //writeCell(file1, &c1);
 
