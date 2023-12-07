@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     fprintf(file, "Hello, world!\n");
 
     // Call the readCell function
-    Cell cell = {};
+    struct Cell cell;
     cell.ID = 0;
     cell.parentID = 0;
     cell.lineage = 0;
