@@ -165,6 +165,7 @@ static void writeCell(FILE *file, struct Cell *cell) {
             fprintf(file, "%s", buffer);
 			if (inst == 0xf) { /* STOP */
 				if (++stopCount >= 4)
+                    fprintf(file, "%s", "stopped");
 					break;
 			} else stopCount = 0;
 			if ((shiftPtr += 4) >= SYSWORD_BITS) {
