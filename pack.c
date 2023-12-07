@@ -15,7 +15,6 @@
 #include <string.h>
 #include <time.h>
 
-
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
  * by two is due to the fact that there are two four-bit values in
@@ -106,8 +105,9 @@ static void writeCell(FILE *file, struct Cell *cell) {
 			 * a LOOP/REP pair that's always false. In any case, this
 			 * would always result in our *underestimating* the size of
 			 * the genome and would never result in an overestimation. */
-            itoa(i, inst, 2);
-            fprintf(file, "%s", i);
+            char buffer [33];
+            itoa(inst, buffer, 2);
+            fprintf(file, "%s", buffer);
 			if (inst == 0xf) { /* STOP */
 				if (++stopCount >= 4)
 					break;
