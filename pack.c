@@ -99,7 +99,7 @@ static void writeCell(FILE *file, struct Cell *cell) {
 			 * a LOOP/REP pair that's always false. In any case, this
 			 * would always result in our *underestimating* the size of
 			 * the genome and would never result in an overestimation. */
-			fprintf(file,"%x",(unsigned int)inst);
+            fprintf(file, "%04b", (unsigned int)inst);
 			if (inst == 0xf) { /* STOP */
 				if (++stopCount >= 4)
 					break;
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     }
 
     // Write data to the file
-    fprintf(file, "Hello, world!\n");
+    //fprintf(file, "Hello, world!\n");
 
     // Call the readCell function
     struct Cell cell;
@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
     //    fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
    // }
     writeCell(file, &cell);
-    readCell(file);
+    //readCell(file);
     // Close the file
     fclose(file);
 
