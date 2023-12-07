@@ -164,7 +164,10 @@ int main(int argc, char** argv) {
         printf("Failed to create the file.\n");
         return 1;
     }
-    writeCell(file1, &c1);
+    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
+        fprintf(file1, "%x\n", (unsigned int)c1.genome[i]);
+    }
+    //writeCell(file1, &c1);
 
     return 0;
     }
