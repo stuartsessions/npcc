@@ -159,7 +159,7 @@ int main(int argc, char** argv) {
     // Close the file
     fclose(file);
 
-    FILE *file1 = fopen("file.txt", "w");
+    FILE *file1 = fopen("file.txt", "r");
     if (file1 == NULL) {
         printf("Failed to create the file.\n");
         return 1;
