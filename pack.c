@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
         return 1;
     }
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
-        fprintf(file1, "%x", (unsigned int)c1.genome[i]);
+        fprintf(file1, "%x", (unsigned int)pond[0][0].genome[i]);
     }
     //writeCell(file1, &c1);
 
