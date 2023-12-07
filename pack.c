@@ -72,10 +72,9 @@ static void readCell(FILE *file){
     int genomeIndex = 0;
 	int bitIndex = 0;
 	uintptr_t packedValue = 0;
-   
+    struct Cell cell;   
 	for (int i = 0; genomeData[i] != '\0'; i++) {
 		char character = genomeData[i];
-        struct Cell cell;   
 		if (character == '0' || character == '1') {
 			packedValue |= (character - '0') << bitIndex;
 			bitIndex++;
