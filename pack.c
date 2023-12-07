@@ -99,8 +99,6 @@ int main(int argc, char** argv) {
     // Write data to the file
     fprintf(file, "Hello, world!\n");
 
-    // Close the file
-
     // Call the readCell function
     struct Cell cell;
     cell.ID = 0;
@@ -113,11 +111,6 @@ int main(int argc, char** argv) {
     }
     for(unsigned int i=POND_DEPTH_SYSWORDS-1;i<POND_DEPTH_SYSWORDS;++i){
         cell.genome[i] = ~((uintptr_t)0);
-    }
-    file = fopen("file.txt", "r");
-    if (file == NULL) {
-        printf("Failed to open the file.\n");
-        return 1;
     }
 
     readCell(file, &cell);
