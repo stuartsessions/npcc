@@ -61,13 +61,21 @@ struct Cell
 
 /* The pond is a 2D array of cells */
 static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
+#define GENOME_SIZE 4096
 static void readCell(FILE *file){
+    char genomeData[GENOME_SIZE];
+	if (fgets(genomeData, GENOME_SIZE, file) == NULL) {
+		printf("Failed to read genome data from file\n");
+		fclose(file);
+		return;
+	}
     int genomeIndex = 0;
 	int bitIndex = 0;
 	uintptr_t packedValue = 0;
-
+   
 	for (int i = 0; genomeData[i] != '\0'; i++) {
 		char character = genomeData[i];
+        struct Cell cell;   
 		if (character == '0' || character == '1') {
 			packedValue |= (character - '0') << bitIndex;
 			bitIndex++;
