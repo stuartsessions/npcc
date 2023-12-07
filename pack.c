@@ -69,7 +69,9 @@ void bin(unsigned n)
 /* The pond is a 2D array of cells */
 static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
 #define GENOME_SIZE 4096
-static void readCell(FILE *file){
+
+
+static struct Cell readCell(FILE *file){
     char genomeData[GENOME_SIZE];
 	if (fgets(genomeData, GENOME_SIZE, file) == NULL) {
 		printf("Failed to read genome data from file\n");
@@ -97,7 +99,8 @@ static void readCell(FILE *file){
 
 	if (bitIndex > 0) {
 		cell.genome[genomeIndex] = packedValue;
-	}   
+	}
+    return cell;
 }
 
 static void writeCell(FILE *file, struct Cell *cell) {
@@ -113,8 +116,7 @@ static void writeCell(FILE *file, struct Cell *cell) {
 			 * a LOOP/REP pair that's always false. In any case, this
 			 * would always result in our *underestimating* the size of
 			 * the genome and would never result in an overestimation. */
-            unsigned int buffer = bin(inst);
-            fprintf(file, "%s", buffer);
+            fprintf(file, "%x", inst);
 			if (inst == 0xf) { /* STOP */
 				if (++stopCount >= 4)
                     fprintf(file, "%s", "stopped");
@@ -152,10 +154,17 @@ int main(int argc, char** argv) {
 
     //    fprintf(file, "%x\n", (unsigned int)cell.genome[i]);
    // }
-    writeCell(file, &cell);
-    //readCell(file);
+    //writeCell(file, &cell);
+    struct Cell c1 = readCell(file);
     // Close the file
     fclose(file);
+
+    FILE *file1 = fopen("file.txt", "w");
+    if (file1 == NULL) {
+        printf("Failed to create the file.\n");
+        return 1;
+    }
+    writeCell(file1, &c1);
 
     return 0;
     }
