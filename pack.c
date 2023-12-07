@@ -15,17 +15,6 @@
 #include <string.h>
 #include <time.h>
 
-static inline uintptr_t getRandom()
-{
-	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
-	uint64_t x = prngState[0];
-	const uint64_t y = prngState[1];
-	prngState[0] = y;
-	x ^= x << 23;
-	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
-	prngState[1] = z;
-	return (uintptr_t)(z + y);
-}
 
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
@@ -102,22 +91,6 @@ static void readCell(FILE *file, struct Cell *cell) {
     }
 }
 int main(int argc, char** argv) {
-    Cell cell;
-    cell.ID = 0;
-    cell.parentID = 0;
-    cell.lineage = 0;
-    cell.generation = 0;
-    cell.energy = 0;
-    for(i=0;i<POND_DEPTH_SYSWORDS;++i)
-        cell.genome[i] = ~((uintptr_t)0);
-
-
-void readCell(FILE *file, struct Cell *cell) {
-    // Implementation of the readCell function
-    // ...
-}
-
-int main(int argc, char** argv) {
     FILE *file = fopen("file.txt", "w");
     if (file == NULL) {
         printf("Failed to create the file.\n");
@@ -132,6 +105,7 @@ int main(int argc, char** argv) {
 
     // Call the readCell function
     struct Cell cell;
+    
     file = fopen("file.txt", "r");
     if (file == NULL) {
         printf("Failed to open the file.\n");
@@ -145,4 +119,4 @@ int main(int argc, char** argv) {
 
     return 0;
     }
-}
+
