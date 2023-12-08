@@ -482,7 +482,7 @@ static void dumpCell(FILE *file, struct Cell *cell)
 /*
 static inline struct Cell *getNeighbor(const uintptr_t x,const uintptr_t y,const uintptr_t dir)
 {
-	/* Space is toroidal; it wraps at edges 
+	// Space is toroidal; it wraps at edges 
 	switch(dir) {
 		case N_LEFT:
 			return (x) ? &pond[x-1][y] : &pond[POND_SIZE_X-1][y];
@@ -493,7 +493,7 @@ static inline struct Cell *getNeighbor(const uintptr_t x,const uintptr_t y,const
 		case N_DOWN:
 			return (y < (POND_SIZE_Y-1)) ? &pond[x][y+1] : &pond[x][0];
 	}
-	return &pond[x][y]; /* This should never be reached 
+	return &pond[x][y]; // This should never be reached 
 }
 */
 static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, const uintptr_t dir)
@@ -535,6 +535,7 @@ static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,in
 /*
 static inline int accessAllowedNegative(struct Cell *const c2,const uintptr_t c1guess)
 {
+*/
 	/* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
 	 * "negative" interactions and sense 1 for "positive" ones. 
@@ -542,7 +543,7 @@ static inline int accessAllowedNegative(struct Cell *const c2,const uintptr_t c1
 }
 static inline int accessAllowedPostive(struct Cell *const c2,const uintptr_t c1guess)
 {
-	/* Access permission is more probable if they are more similar in sense 0,
+*/	/* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
 	 * "negative" interactions and sense 1 for "positive" ones. 
 	return (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)); 
@@ -897,21 +898,22 @@ static void *run(void *targ)
                         falseLoopDepth = !reg;
                         
                         break;
-					/*
-					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero 
-						if (loopStackPtr) {
+
+					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
+                                 if (loopStackPtr) {
 							--loopStackPtr;
 							if (reg) {
 								wordPtr = loopStack_wordPtr[loopStackPtr];
 								shiftPtr = loopStack_shiftPtr[loopStackPtr];
 								currentWord = pptr->genome[wordPtr];
-								/* This ensures that the LOOP is rerun 
+								//This ensures that the LOOP is rerun 
 								continue;
 							}
 						}
 						break;
-					*/
-					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
+					
+                                /*
+					case 0xa: // REP: Jump back to matching LOOP if register is nonzero
 						int condition1 = loopStackPtr > 0;
 						int condition2 = reg != 0;
 						uintptr_t newLoopStackPtr = loopStackPtr - condition1;
@@ -924,6 +926,7 @@ static void *run(void *targ)
 						currentWord = newCurrentWord;
 						if (condition1 * condition2) continue;
 						break;
+                        */
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						facing = reg & 3;
 						break;
@@ -967,8 +970,8 @@ static void *run(void *targ)
 							else pptr->energy = 0;
 						}
 						break;
-				
-					/*case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed 
+				/*
+					case 0xe: // SHARE: Equalize energy between self and neighbor if allowed 
 						tmpptr = getNeighbor(x,y,facing);
 						if (accessAllowed(tmpptr,reg,1)) {
 							if (tmpptr->generation > 2)
