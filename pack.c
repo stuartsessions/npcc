@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < POND_SIZE_X; i++) {
         for (int j = 0; j < POND_SIZE_Y; j++) {
             char line[GENOME_SIZE];
-            if (fgets(line, sizeof(line), file) == NULL) {
+            if (fgets(line, sizeof(line)+50, file) == NULL) {
                 printf("Failed to read the file.\n");
                 return 1;
             }
