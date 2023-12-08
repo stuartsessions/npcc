@@ -91,6 +91,8 @@ static struct Cell readCell(char *genomeData) {
     uintptr_t packedValue = 0;
     struct Cell cell;
 
+    printf("Size of genomeData: %zu\n", strlen(genomeData));
+    
     for (int i = 0; genomeData[i] != '\0'; i++) {
         char character = genomeData[i];
         printf("%c", character);
