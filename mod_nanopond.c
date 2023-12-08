@@ -758,22 +758,28 @@ static void *run(void *targ)
                                      ptr_wordPtr = 0;
                                  ptr_shiftPtr = 0;
                              }
-                        */ 
-                        
-                        ptr_shiftPtr = 
-                            (ptr_shiftPtr + 4) * (( ptr_shiftPtr + 4) < SYSWORD_BITS);
+                        */
+
+
+                        // ptr_shiftPtr increments by 4 to simulate a forward pointer, and
+                        // if it gets to be bigger than SYSWORD_BITS, it resets to zero. 
+                        ptr_shiftPtr=(ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS);
                         // If ptr_shiftPtr +=4 goes beyond SYSWORD_Bits:
                         //      It resets itself to zero.
                         //      ptr_wordPtr tries to add 1 to itself. If that takes it
                         //      to POND_DEPTH_SYSWORDS, then it resets to zero.
-                        ptr_wordPtr = 
-                            ptr_wordPtr * (ptr_shiftPtr!=0 
-                                || ((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))
-                            +
-                            (ptr_shiftPtr ==0) * ((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS);
+                        ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
 
                         break;
-					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
+					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */ 
+                        
+                        // ptr_shiftPtr decrements 4 until it reaches zero, and then
+                        // it resets at SYSWORD_BITS - 4
+                        ptr_shiftPtr=((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4;
+                        // ptr_wordPtr decrements 1 when ptr_shiftPtr reaches 0. If 
+                        // ptr_wordPtr is already zero, then it resets at
+                        // POND_DEPTH_SYSWORDS-1 
+                        ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
                         /* 
                         if (ptr_shiftPtr)
                                  ptr_shiftPtr -= 4;
@@ -784,17 +790,7 @@ static void *run(void *targ)
                                  ptr_shiftPtr = SYSWORD_BITS - 4;
                              }
                        
-                       */ 
-                        ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                      
-                        ptr_wordPtr = 
-                            ((ptr_wordPtr == 0 && ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS)) 
-                            +
-                            ptr_wordPtr - (ptr_shiftPtr==(SYSWORD_BITS-4));
-                        
+                       */
                         break;
 					case 0x3: /* INC: Increment the register */
 						reg = (reg + 1) & 0xf;
