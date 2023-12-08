@@ -479,9 +479,10 @@ static void dumpCell(FILE *file, struct Cell *cell)
 	fprintf(file,"\n");
 }
 #endif
+/*
 static inline struct Cell *getNeighbor(const uintptr_t x,const uintptr_t y,const uintptr_t dir)
 {
-	/* Space is toroidal; it wraps at edges */
+	/* Space is toroidal; it wraps at edges 
 	switch(dir) {
 		case N_LEFT:
 			return (x) ? &pond[x-1][y] : &pond[POND_SIZE_X-1][y];
@@ -492,7 +493,20 @@ static inline struct Cell *getNeighbor(const uintptr_t x,const uintptr_t y,const
 		case N_DOWN:
 			return (y < (POND_SIZE_Y-1)) ? &pond[x][y+1] : &pond[x][0];
 	}
-	return &pond[x][y]; /* This should never be reached */
+	return &pond[x][y]; /* This should never be reached 
+}
+*/
+static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, const uintptr_t dir)
+{
+    /* Define the changes in the x and y coordinates for each direction */
+    int dx[] = {-1, 1, 0, 0}; // Changes in x for N_LEFT, N_RIGHT, N_UP, N_DOWN
+    int dy[] = {0, 0, -1, 1}; // Changes in y for N_LEFT, N_RIGHT, N_UP, N_DOWN
+
+    /* Calculate the new coordinates */
+    uintptr_t newX = (x + dx[dir] + POND_SIZE_X) % POND_SIZE_X;
+    uintptr_t newY = (y + dy[dir] + POND_SIZE_Y) % POND_SIZE_Y;
+
+    return &pond[newX][newY];
 }
 
 static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,int sense)
@@ -502,6 +516,29 @@ static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,in
 	 * "negative" interactions and sense 1 for "positive" ones. */
 	return sense ? (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) : (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID));
 }
+
+static inline int accessAllowedNegative(struct Cell *const c2,const uintptr_t c1guess)
+{
+	/* Access permission is more probable if they are more similar in sense 0,
+	 * and more probable if they are different in sense 1. Sense 0 is used for
+	 * "negative" interactions and sense 1 for "positive" ones. */
+	return (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) 
+}
+static inline int accessAllowedPostive(struct Cell *const c2,const uintptr_t c1guess)
+{
+	/* Access permission is more probable if they are more similar in sense 0,
+	 * and more probable if they are different in sense 1. Sense 0 is used for
+	 * "negative" interactions and sense 1 for "positive" ones. */
+	return (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)); 
+}
+static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
+{
+    int randomValue = getRandom() & 0xf;
+    int genomeValue = BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)];
+    int comparisonValue = sense ? genomeValue : 15 - genomeValue;
+    return (randomValue >= comparisonValue) || (!c2->parentID);
+}
+
 #ifdef USE_SDL
 static inline uint8_t getColor(struct Cell *c)
 {
@@ -896,17 +933,11 @@ static void *run(void *targ)
 					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
 						if (accessAllowed(tmpptr,reg,1)) {
-#ifdef USE_PTHREADS_COUNT
-							pthread_mutex_lock(&(tmpptr->lock));
-#endif
 							if (tmpptr->generation > 2)
 								++statCounters.viableCellShares;
 							tmp = pptr->energy + tmpptr->energy;
 							tmpptr->energy = tmp / 2;
 							pptr->energy = tmp - tmpptr->energy;
-#ifdef USE_PTHREADS_COUNT
-							pthread_mutex_unlock(&(tmpptr->lock));
-#endif
 						}
 						break;
 					case 0xf: /* STOP: End execution */
