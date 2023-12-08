@@ -182,8 +182,8 @@ int main(int argc, char** argv) {
     for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
         //fprintf(file1, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY((unsigned int)pond[0][0].genome[i]));
         //fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1);
-        //fprintf(file1, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY((unsigned int)pond[0][0].genome[i]));
-        fprintf(file1, "%x\n", (unsigned int)pond[0][0].genome[i]);
+        fprintf(file1, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY((unsigned int)pond[0][0].genome[i]));
+        //fprintf(file1, "%x\n", (unsigned int)pond[0][0].genome[i]);
     }
     
     //writeCell(file1, &c1);
