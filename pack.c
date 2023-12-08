@@ -91,11 +91,11 @@ static struct Cell readCell(char *genomeData) {
     uintptr_t packedValue = 0;
     struct Cell cell;
 
-    printf("Size of genomeData: %zu\n", strlen(genomeData));
+    //printf("Size of genomeData: %zu\n", strlen(genomeData));
     
     for (int i = 0; genomeData[i] != '\0'; i++) {
         char character = genomeData[i];
-        printf("%c", character);
+        //printf("%c", character);
         if (character == '0' || character == '1') {
             packedValue |= (character - '0') << shiftPtr;
             shiftPtr += 4;
