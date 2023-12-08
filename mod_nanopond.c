@@ -793,7 +793,8 @@ static void *run(void *targ)
 				else if (inst == 0xa) /* Decrement on REP */
 					--falseLoopDepth;
 			} else {
-				/* If we're not in a false LOOP/REP, execute normally */
+				
+				pptr->genome[ptr_wordPtr]=(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr));                 /* If we're not in a false LOOP/REP, execute normally */
 				
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
@@ -858,16 +859,18 @@ static void *run(void *targ)
 						reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x6: /* WRITEG: Write out from the register to genome */
-						pptr->genome[ptr_wordPtr] &= ~(((uintptr_t)0xf) << ptr_shiftPtr);
-						pptr->genome[ptr_wordPtr] |= reg << ptr_shiftPtr;
-						currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
+                        
+                        /*
+                        pptr->genome[ptr_wordPtr]=(pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
+*/
+						
+                        currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
 						reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x8: /* WRITEB: Write out from the register to buffer */
-						outputBuf[ptr_wordPtr] &= ~(((uintptr_t)0xf) << ptr_shiftPtr);
-						outputBuf[ptr_wordPtr] |= reg << ptr_shiftPtr;
+						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
 						break;
 					case 0x9: /* LOOP: Jump forward to matching REP if register is zero */
 					    /*	
@@ -945,8 +948,7 @@ static void *run(void *targ)
  
 						tmp = reg;
 						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
-						pptr->genome[wordPtr] &= ~(((uintptr_t)0xf) << shiftPtr);
-						pptr->genome[wordPtr] |= tmp << shiftPtr;
+						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
