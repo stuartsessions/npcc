@@ -9,6 +9,6 @@ gui:
 	./nanopond > c1
 	./mod_nanopond > c2
 	diff -u c1 c2
-
+	rm nanopond mod_nanopond c1 c2
 clean:
 	rm -f *.o nanopond *.dSYM
