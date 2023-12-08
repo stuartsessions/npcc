@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
                 printf("Failed to read the file.\n");
                 return 1;
             }
-            printf("%s", line); 
+            printf("%s\n\n", line); 
             pond[i][j] = readCell(line);
             while( ! strchr( line, '\n' ) ){
                 if( ! fgets(line,(sizeof line),stdin) ) {
