@@ -743,7 +743,9 @@ static void *run(void *targ)
 				
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
-				
+			    
+                // FOR FUTURE: Switch can be done by getting each variable, and using
+                // var = (i==0x1){A} + (i==0x2){B} + ...	
 				switch(inst) {
 					case 0x0: /* ZERO: Zero VM state registers */
 						reg = 0;
@@ -825,24 +827,18 @@ static void *run(void *targ)
 							}
 						} else falseLoopDepth = 1;
 				        */
+                        // stop gets set to 1 if there is a value in the register, but
+                        // the loopStackPtr >= POND_DEPTH (A stack overflow)
+                        stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
+                        // loopStack_wordPtr[loopStackPtr] gets set to the current
+                        // wordPtr if there is a value in the register and there is no
+                        // Stack overflow.
+                        loopStack_wordPtr[loopStackPtr]=loopStack_wordPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(wordPtr*(reg&&(loopStackPtr<POND_DEPTH)));
                         
-                        stop = stop * !(reg && (loopStackPtr >= POND_DEPTH))                   
-                            +
-                            (reg && (loopStackPtr >= POND_DEPTH));
-                        
-                        loopStack_wordPtr[loopStackPtr] =
-                            loopStack_wordPtr[loopStackPtr] 
-                            * 
-                            (!reg || (loopStackPtr>=POND_DEPTH))
-                            +
-                            (wordPtr * (reg && (loopStackPtr<POND_DEPTH)));
-                        
-                        loopStack_shiftPtr[loopStackPtr] =
-                            loopStack_shiftPtr[loopStackPtr] 
-                            * 
-                            (!reg || (loopStackPtr>=POND_DEPTH))
-                            +
-                            (shiftPtr * (reg && (loopStackPtr<POND_DEPTH)));
+                        // loopStack_shiftPtr[loopStackPtr] gets set to the current
+                        // shiftPtr if there is a value in the register and there is no
+                        // stack overflow
+                        loopStack_shiftPtr[loopStackPtr]=loopStack_shiftPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(shiftPtr*(reg&&(loopStackPtr<POND_DEPTH)));
 
                         loopStackPtr = loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH));
                         falseLoopDepth = !reg;
