@@ -157,6 +157,7 @@ int main(int argc, char** argv) {
             printf("%s\n\n", line); 
             pond[i][j] = readCell(line);
             while( ! strchr( line, '\n' ) ){
+                printf("%s", "haha");
                 if( ! fgets(line,(sizeof line),stdin) ) {
                     break;
                 }
