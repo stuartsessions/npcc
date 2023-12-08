@@ -82,7 +82,7 @@ void bin(unsigned n)
 
 /* The pond is a 2D array of cells */
 static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
-#define GENOME_SIZE 4096
+#define GENOME_SIZE 1025
 
 
 static struct Cell readCell(char *genomeData) {
@@ -101,6 +101,9 @@ static struct Cell readCell(char *genomeData) {
             shiftPtr += 4;
 
             if (shiftPtr >= SYSWORD_BITS) {
+                if (wordPtr >= sizeof(cell.genome) / sizeof(cell.genome[0])) {
+                    break; // Prevents memory error
+                }
                 cell.genome[wordPtr] = packedValue;
                 wordPtr++;
                 shiftPtr = 0;
