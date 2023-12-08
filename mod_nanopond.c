@@ -752,56 +752,44 @@ static void *run(void *targ)
 						facing = 0;
 						break;
 					case 0x1: /* FWD: Increment the pointer (wrap at end) */
-				        ptr_shiftPtr = 
-                            (ptr_shiftPtr + 4) * (( ptr_shiftPtr + 4) < SYSWORD_BITS);
-
                         /*
+                        if ((ptr_shiftPtr += 4) >= SYSWORD_BITS) {
+                                 if (++ptr_wordPtr >= POND_DEPTH_SYSWORDS)
+                                     ptr_wordPtr = 0;
+                                 ptr_shiftPtr = 0;
+                             }
+                        */ 
+                        
+                        ptr_shiftPtr = 
+                            (ptr_shiftPtr + 4) * (( ptr_shiftPtr + 4) < SYSWORD_BITS);
+                        // If ptr_shiftPtr +=4 goes beyond SYSWORD_Bits:
+                        //      It resets itself to zero.
+                        //      ptr_wordPtr tries to add 1 to itself. If that takes it
+                        //      to POND_DEPTH_SYSWORDS, then it resets to zero.
                         ptr_wordPtr = 
-                            (ptr_wordPtr + !ptr_shiftPtr)
-                            *
-                            ((ptr_wordPtr + !ptr_shiftPtr) < POND_DEPTH_SYSWORDS);
-						*/
-                       
-                        ptr_wordPtr = 
-                           (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * ptr_wordPtr 
-                           + 
-                           (ptr_wordPtr+1 < POND_DEPTH_SYSWORDS) * !ptr_shiftPtr;
+                            ptr_wordPtr * (ptr_shiftPtr!=0 
+                                || ((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))
+                            +
+                            (ptr_shiftPtr ==0) * ((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS);
 
                         break;
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */
-                        /*  
+                        /* 
                         if (ptr_shiftPtr)
-                        {
-                            ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                        }
-                        else
-                        {
-                            if (ptr_wordPtr)
-                                --ptr_wordPtr;
-                            else
-                            {
-                                ptr_wordPtr = POND_DEPTH_SYSWORDS - 1;
-                            }
-                            ptr_shiftPtr = 
-                            ((ptr_shiftPtr == 0) * SYSWORD_BITS)
-                            +
-                            ptr_shiftPtr - 4;
-                        }
-                       */
-                        
+                                 ptr_shiftPtr -= 4;
+                             else {
+                                 if (ptr_wordPtr)
+                                     --ptr_wordPtr;
+                                 else ptr_wordPtr = POND_DEPTH_SYSWORDS - 1;
+                                 ptr_shiftPtr = SYSWORD_BITS - 4;
+                             }
+                       
+                       */ 
                         ptr_shiftPtr = 
                             ((ptr_shiftPtr == 0) * SYSWORD_BITS)
                             +
                             ptr_shiftPtr - 4;
                       
-
-                       // This is where the error is, the fact that shiftptr is never 0,
-                       // and if it is it immediately get set to something else. 
-                       
-
                         ptr_wordPtr = 
                             ((ptr_wordPtr == 0 && ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS)) 
                             +
