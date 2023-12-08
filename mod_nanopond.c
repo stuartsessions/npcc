@@ -947,7 +947,7 @@ static void *run(void *targ)
 						}
 						break;
 				
-					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
+					/*case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed 
 						tmpptr = getNeighbor(x,y,facing);
 						if (accessAllowed(tmpptr,reg,1)) {
 							if (tmpptr->generation > 2)
@@ -957,17 +957,18 @@ static void *run(void *targ)
 							pptr->energy = tmp - tmpptr->energy;
 						}
 						break; 
-				/*
-					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed 
+				*/
+					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
 						int access = accessAllowed(tmpptr,reg,1);
 						int generationCondition = tmpptr->generation > 2;
+						tmp = pptr->energy + tmpptr->energy;
 						statCounters.viableCellShares += access * generationCondition;
 						uintptr_t newEnergyNeighbor = access * (tmp / 2) + (1 - access) * tmpptr->energy;
 						uintptr_t newEnergySelf = access * (tmp - newEnergyNeighbor) + (1 - access) * pptr->energy;
 						tmpptr->energy = newEnergyNeighbor;
 						pptr->energy = newEnergySelf;
-						break; */
+						break; 
 					case 0xf: /* STOP: End execution */
 						stop = 1;
 						break;
