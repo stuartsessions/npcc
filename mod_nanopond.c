@@ -532,19 +532,19 @@ static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,in
     return sense ? (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) : (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID));
 
 }
-
+/*
 static inline int accessAllowedNegative(struct Cell *const c2,const uintptr_t c1guess)
 {
 	/* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
-	 * "negative" interactions and sense 1 for "positive" ones. */
+	 * "negative" interactions and sense 1 for "positive" ones. 
 	return (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) 
 }
 static inline int accessAllowedPostive(struct Cell *const c2,const uintptr_t c1guess)
 {
 	/* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
-	 * "negative" interactions and sense 1 for "positive" ones. */
+	 * "negative" interactions and sense 1 for "positive" ones. 
 	return (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)); 
 }
 static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
@@ -554,7 +554,7 @@ static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, 
     int comparisonValue = sense ? genomeValue : 15 - genomeValue;
     return (randomValue >= comparisonValue) || (!c2->parentID);
 }
-
+*/
 #ifdef USE_SDL
 static inline uint8_t getColor(struct Cell *c)
 {
