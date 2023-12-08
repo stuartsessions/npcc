@@ -117,7 +117,23 @@ static struct Cell readCell(char *genomeData) {
     }
     return cell;
 }
+void printUnpackedCell(struct Cell cell) {
+    uintptr_t wordPtr = 0;
+    uintptr_t shiftPtr = 0;
+    uintptr_t packedValue;
 
+    while (wordPtr < sizeof(cell.genome) / sizeof(cell.genome[0])) {
+        packedValue = cell.genome[wordPtr];
+        while (shiftPtr < SYSWORD_BITS) {
+            char character = (packedValue >> shiftPtr) & 0xF;
+            printf("%c", character + '0');
+            shiftPtr += 4;
+        }
+        wordPtr++;
+        shiftPtr = 0;
+    }
+    printf("\n");
+}
 static void writeCell(FILE *file, struct Cell *cell) {
     uintptr_t wordPtr,shiftPtr,inst,stopCount,i;
 		wordPtr = 0;
@@ -179,12 +195,7 @@ int main(int argc, char** argv) {
         printf("Failed to create the file.\n");
         return 1;
     }
-    for(unsigned int i=0;i<POND_DEPTH_SYSWORDS;++i){
-        //fprintf(file1, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY((unsigned int)pond[0][0].genome[i]));
-        //fwrite(pond[0][0].genome, sizeof(pond[0][0].genome), 1, file1);
-        fprintf(file1, BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY((unsigned int)pond[0][0].genome[i]));
-        //fprintf(file1, "%x\n", (unsigned int)pond[0][0].genome[i]);
-    }
+    printUnpackedCell(pond[0][0]);
     
     //writeCell(file1, &c1);
     fclose(file1);
