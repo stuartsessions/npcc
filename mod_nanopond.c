@@ -514,7 +514,23 @@ static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,in
 	/* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
 	 * "negative" interactions and sense 1 for "positive" ones. */
-	return sense ? (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) : (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID));
+/*	
+	return !!sense * (
+            (
+             (getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) 
+             ^ 
+             (c1guess & 0xf)])
+            ||(!c2->parentID)
+            ) 
+        +
+       !sense * (
+                ((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])
+                ||(!c2->parentID));
+
+  */
+    
+    return sense ? (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) : (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID));
+
 }
 
 static inline int accessAllowedNegative(struct Cell *const c2,const uintptr_t c1guess)
@@ -948,14 +964,41 @@ static void *run(void *targ)
 			
 			/* Advance the shift and word pointers, and loop around
 			 * to the beginning at the end of the genome. */
-			if ((shiftPtr += 4) >= SYSWORD_BITS) {
+			/*
+            if ((shiftPtr += 4) >= SYSWORD_BITS) {
 				if (++wordPtr >= POND_DEPTH_SYSWORDS) {
 					wordPtr = EXEC_START_WORD;
 					shiftPtr = EXEC_START_BIT;
 				} else shiftPtr = 0;
 				currentWord = pptr->genome[wordPtr];
 			}
-		}
+            */
+            
+            wordPtr =
+            wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))
+            +
+            ((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))
+            +
+            EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)
+                                &&(shiftPtr+4>=SYSWORD_BITS));
+            
+            currentWord =
+            currentWord*(shiftPtr+4<SYSWORD_BITS)
+            +
+            (pptr->genome[wordPtr])*(shiftPtr+4>=SYSWORD_BITS);
+            
+            
+            shiftPtr = 
+                (shiftPtr+4)
+                +
+                (shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
+                //+
+                //(EXEC_START_BIT)*(wordPtr+1>=POND_DEPTH_SYSWORDS)
+                //*(shiftPtr+4>=SYSWORD_BITS);
+            
+
+
+        }   
 
 		/* Copy outputBuf into neighbor if access is permitted and there
 		 * is energy there to make something happen. There is no need
