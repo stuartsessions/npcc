@@ -876,12 +876,18 @@ static void *run(void *targ)
 						facing = reg & 3;
 						break;
 					case 0xc: /* XCHG: Skip next instruction and exchange value of register with it */
-						if ((shiftPtr += 4) >= SYSWORD_BITS) {
-							if (++wordPtr >= POND_DEPTH_SYSWORDS) {
-								wordPtr = EXEC_START_WORD;
-								shiftPtr = EXEC_START_BIT;
-							} else shiftPtr = 0;
-						}
+						// increment wordptr by 1 if the shift Ptr is going to go
+                        // beyond the current word it is reading.
+                        // Set the wordptr to EXEC_START_WORD if the end of the
+                        // POND_DEPTH_SYSWORDS has been reached. 
+                        wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
+            
+            //shiftPtr shifts the current nibble being read by the machine
+            //It incrememnts four bits until it gets past SYSWORD_BITS, the 
+            //number of bits in a word, and then resets at either 0 or
+            //EXEC_START_BIT
+                        shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
+ 
 						tmp = reg;
 						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr] &= ~(((uintptr_t)0xf) << shiftPtr);
@@ -933,7 +939,27 @@ static void *run(void *targ)
 			
 			/* Advance the shift and word pointers, and loop around
 			 * to the beginning at the end of the genome. */
-			/*
+			
+
+            // increment wordptr by 1 if the shift Ptr is going to go
+            // beyond the current word it is reading.
+            // Set the wordptr to EXEC_START_WORD if the end of the
+            // POND_DEPTH_SYSWORDS has been reached.
+            wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
+
+            //currentWord gets incremented when the shiftptr is greater than
+            //SYSWORD_BITS, and it's time to move to the next word
+            currentWord=currentWord*(shiftPtr+4<SYSWORD_BITS)+(pptr->genome[wordPtr])*(shiftPtr+4>=SYSWORD_BITS);
+            
+            //shiftPtr shifts the current nibble being read by the machine
+            //It incrememnts four bits until it gets past SYSWORD_BITS, the 
+            //number of bits in a word, and then resets at either 0 or
+            //EXEC_START_BIT
+            shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
+                //+
+                //(EXEC_START_BIT)*(wordPtr+1>=POND_DEPTH_SYSWORDS)
+                //*(shiftPtr+4>=SYSWORD_BITS);
+            /*
             if ((shiftPtr += 4) >= SYSWORD_BITS) {
 				if (++wordPtr >= POND_DEPTH_SYSWORDS) {
 					wordPtr = EXEC_START_WORD;
@@ -942,31 +968,6 @@ static void *run(void *targ)
 				currentWord = pptr->genome[wordPtr];
 			}
             */
-            
-            wordPtr =
-            wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))
-            +
-            ((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))
-            +
-            EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)
-                                &&(shiftPtr+4>=SYSWORD_BITS));
-            
-            currentWord =
-            currentWord*(shiftPtr+4<SYSWORD_BITS)
-            +
-            (pptr->genome[wordPtr])*(shiftPtr+4>=SYSWORD_BITS);
-            
-            
-            shiftPtr = 
-                (shiftPtr+4)
-                +
-                (shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
-                //+
-                //(EXEC_START_BIT)*(wordPtr+1>=POND_DEPTH_SYSWORDS)
-                //*(shiftPtr+4>=SYSWORD_BITS);
-            
-
-
         }   
 
 		/* Copy outputBuf into neighbor if access is permitted and there
