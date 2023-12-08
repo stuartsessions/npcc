@@ -85,7 +85,7 @@ static struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
 #define GENOME_SIZE 4096
 
 
-static struct Cell readCell(const char *genomeData) {
+static struct Cell readCell(char *genomeData) {
     uintptr_t wordPtr = 0;
     uintptr_t shiftPtr = 0;
     uintptr_t packedValue = 0;
@@ -93,6 +93,7 @@ static struct Cell readCell(const char *genomeData) {
 
     for (int i = 0; genomeData[i] != '\0'; i++) {
         char character = genomeData[i];
+        printf("%c", character);
         if (character == '0' || character == '1') {
             packedValue |= (character - '0') << shiftPtr;
             shiftPtr += 4;
@@ -154,7 +155,7 @@ int main(int argc, char** argv) {
                 printf("Failed to read the file.\n");
                 return 1;
             }
-            printf("%s\n\n", line); 
+            //printf("%s\n\n", line); 
             pond[i][j] = readCell(line);
             while (!strchr(line, '\n')) {
                 printf("%s", "haha");
