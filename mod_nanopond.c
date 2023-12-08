@@ -897,17 +897,32 @@ static void *run(void *targ)
                         falseLoopDepth = !reg;
                         
                         break;
-					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
+					/*
+					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero 
 						if (loopStackPtr) {
 							--loopStackPtr;
 							if (reg) {
 								wordPtr = loopStack_wordPtr[loopStackPtr];
 								shiftPtr = loopStack_shiftPtr[loopStackPtr];
 								currentWord = pptr->genome[wordPtr];
-								/* This ensures that the LOOP is rerun */
+								/* This ensures that the LOOP is rerun 
 								continue;
 							}
 						}
+						break;
+					*/
+					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
+						int condition1 = loopStackPtr > 0;
+						int condition2 = reg != 0;
+						uintptr_t newLoopStackPtr = loopStackPtr - condition1;
+						uintptr_t newWordPtr = condition1 * condition2 * loopStack_wordPtr[newLoopStackPtr] + (1 - condition1 * condition2) * wordPtr;
+						uintptr_t newShiftPtr = condition1 * condition2 * loopStack_shiftPtr[newLoopStackPtr] + (1 - condition1 * condition2) * shiftPtr;
+						uintptr_t newCurrentWord = condition1 * condition2 * pptr->genome[newWordPtr] + (1 - condition1 * condition2) * currentWord;
+						loopStackPtr = newLoopStackPtr;
+						wordPtr = newWordPtr;
+						shiftPtr = newShiftPtr;
+						currentWord = newCurrentWord;
+						if (condition1 * condition2) continue;
 						break;
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						facing = reg & 3;
