@@ -952,7 +952,8 @@ static void *run(void *targ)
 						currentWord = pptr->genome[wordPtr];
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
-						int access_var = accessAllowed(tmpptr,reg,0);
+						tmpptr=getNeighbor(x,y,facing);
+                        int access_var = accessAllowed(tmpptr,reg,0);
                         tmp = 1; 
                         statCounters.viableCellsKilled=statCounters.viableCellsKilled+(access_var)*(tmpptr->generation>2);
                         tmpptr->genome[0] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
