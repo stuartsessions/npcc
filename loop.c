@@ -102,4 +102,3 @@ switch(inst) {
 						stop = 1;
 						break;
 				}
-			}
