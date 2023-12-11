@@ -839,10 +839,8 @@ static void *run(void *targ)
 						int access = accessAllowed(tmpptr,reg,1);
 						tmp = pptr->energy + tmpptr->energy;
 						statCounters.viableCellShares += access * (tmpptr->generation > 2);
-						uintptr_t newEnergyNeighbor = access * (tmp / 2) + (1 - access) * tmpptr->energy;
-						uintptr_t newEnergySelf = access * (tmp - newEnergyNeighbor) + (1 - access) * pptr->energy;
-						tmpptr->energy = newEnergyNeighbor;
-						pptr->energy = newEnergySelf;
+						tmpptr->energy = (access * (tmp / 2) + (1 - access) * tmpptr->energy);
+						pptr->energy = (access * (tmp - (access * (tmp / 2) + (1 - access) * tmpptr->energy)) + (1 - access) * pptr->energy);
 						break; 
 					case 0xf: /* STOP: End execution */
 						//stop = 1;
