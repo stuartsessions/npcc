@@ -805,8 +805,8 @@ static void *run(void *targ)
 				((inst==0x3)*((reg + 1) & 0xf)) +
 				((inst==0x4)*((reg - 1) & 0xf)) + 
 				((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
-				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) + 
-				//((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
+				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)); 
+				//+((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
 				/*facing is called in 0x0 and 0xb
 				* facing is used to determine which direction the cell is facing
 				*/
