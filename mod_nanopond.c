@@ -650,7 +650,7 @@ static void *run(void *targ)
 				* set in 0x6, 0xa, 0xc, 
 				*/
 				currentWord=
-				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb ||inst == 0xc || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
 				((inst==0x6)*(pptr->genome[wordPtr]))+
 				//((inst==0xa)*())
 				((inst == 0xc)*(pptr->genome[wordPtr]));
@@ -775,22 +775,6 @@ static void *run(void *targ)
 							}
 						}
 						break;
-					
-                                /*
-					case 0xa: // REP: Jump back to matching LOOP if register is nonzero
-						int condition1 = loopStackPtr > 0;
-						int condition2 = reg != 0;
-						uintptr_t newLoopStackPtr = loopStackPtr - condition1;
-						uintptr_t newWordPtr = condition1 * condition2 * loopStack_wordPtr[newLoopStackPtr] + (1 - condition1 * condition2) * wordPtr;
-						uintptr_t newShiftPtr = condition1 * condition2 * loopStack_shiftPtr[newLoopStackPtr] + (1 - condition1 * condition2) * shiftPtr;
-						uintptr_t newCurrentWord = condition1 * condition2 * pptr->genome[newWordPtr] + (1 - condition1 * condition2) * currentWord;
-						loopStackPtr = newLoopStackPtr;
-						wordPtr = newWordPtr;
-						shiftPtr = newShiftPtr;
-						currentWord = newCurrentWord;
-						if (condition1 * condition2) continue;
-						break;
-                        */
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						//facing = reg & 3;
 						break;
@@ -801,10 +785,10 @@ static void *run(void *targ)
                         // POND_DEPTH_SYSWORDS has been reached. 
                         wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
             
-            //shiftPtr shifts the current nibble being read by the machine
-            //It incrememnts four bits until it gets past SYSWORD_BITS, the 
-            //number of bits in a word, and then resets at either 0 or
-            //EXEC_START_BIT
+						//shiftPtr shifts the current nibble being read by the machine
+						//It incrememnts four bits until it gets past SYSWORD_BITS, the 
+						//number of bits in a word, and then resets at either 0 or
+						//EXEC_START_BIT
                         shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
  
 						tmp = reg;
@@ -826,18 +810,6 @@ static void *run(void *targ)
                         pptr->energy = pptr->energy+!(access_var)*(tmpptr->generation>2)*(-pptr->energy) + !(access_var)*(tmpptr->generation>2)*(pptr->energy-tmp);
 						tmpptr->generation = tmpptr->generation * (access_var);
                         break;
-				/*
-					case 0xe: // SHARE: Equalize energy between self and neighbor if allowed 
-						tmpptr = getNeighbor(x,y,facing);
-						if (accessAllowed(tmpptr,reg,1)) {
-							if (tmpptr->generation > 2)
-								++statCounters.viableCellShares;
-							tmp = pptr->energy + tmpptr->energy;
-							tmpptr->energy = tmp / 2;
-							pptr->energy = tmp - tmpptr->energy;
-						}
-						break; 
-				*/
 					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
 						int access = accessAllowed(tmpptr,reg,1);
