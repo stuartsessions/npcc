@@ -982,7 +982,7 @@ static void *run(void *targ)
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
 						tmpptr = getNeighbor(x,y,facing);
 						int access_var = accessAllowed(tmpptr,reg,0);
-                        tmp = 1; 
+                        //tmp = 1; 
                         statCounters.viableCellsKilled=statCounters.viableCellsKilled+(access_var)*(tmpptr->generation>2);
                         tmpptr->genome[0] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
                         tmpptr->genome[1] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
@@ -990,7 +990,7 @@ static void *run(void *targ)
                         tmpptr->parentID = tmpptr->parentID * !(access_var);
                         tmpptr->lineage = tmpptr->lineage * !(access_var) + (access_var)*cellIdCounter;
                         cellIdCounter=cellIdCounter * !(access_var) + (access_var)* cellIdCounter;
-                        tmp = tmp * (access_var) + tmp * (tmpptr->generation>2)*!(access_var)*(pptr->energy / FAILED_KILL_PENALTY);
+                        tmp = (access_var) + (tmpptr->generation>2)*!(access_var)*(pptr->energy / FAILED_KILL_PENALTY);
                         pptr->energy = pptr->energy+!(access_var)*(tmpptr->generation>2)*(-pptr->energy) + !(access_var)*(tmpptr->generation>2)*(pptr->energy-tmp);
      
                         tmpptr->generation = tmpptr->generation * (access_var);
