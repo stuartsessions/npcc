@@ -620,7 +620,9 @@ static void *run(void *targ)
 
 				
 
-				
+				/*
+				* TODO: 0xc
+				*/
 				reg=
 				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst==0xc || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
 				((inst==0x0)*0) + 
@@ -645,11 +647,24 @@ static void *run(void *targ)
 				* in 0x6 it wanted us to change the genome so we have to do it every single time. 
 				* this was used in case 0x6 and left the same in all other cases.
 				*/
+				
+				/*
+				* wordPtr
+				* set in 0xa
+				*/
+
+				/*
+				* outputBuf[ptr_wordPtr]
+				* set in 0x8
+				*/
+				outputBuf[ptr_wordPtr]=
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5|| inst == 0x6 || inst==0x7||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(outputBuf[ptr_wordPtr])+
+				((inst==0x8)*((outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr));
 				/*
 				* currentWord
-				* set in 0x6, 0xa, 0xc, 
+				* set in 0x6, 0xa, 0xc
+				* TODO: 0xa, 0xc
 				*/
-				
 				currentWord=
 				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst == 0xc || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
 				((inst==0x6)*(pptr->genome[wordPtr]));
