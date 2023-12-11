@@ -800,7 +800,7 @@ static void *run(void *targ)
 				*/
 				
 				reg=
-				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
+				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9  || inst == 0xb || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
 				((inst==0x0)*0) + 
 				((inst==0x3)*((reg + 1) & 0xf)) +
 				((inst==0x4)*((reg - 1) & 0xf)) +
