@@ -795,27 +795,29 @@ static void *run(void *targ)
 			} else {
 
 				/*
-				* reg is called in 0x0, 0x3, 0x4, 0x5, 0x7, 0xc, 0xe
+				* reg is called in 0x0, 0x3, 0x4, 0x5, 0x7, 0xc
 				* 
 				*/
-				/* pptr->genome[ptr_wordPtr]*/
-				pptr->genome[ptr_wordPtr]=
-				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
-				*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr)); 
 				
 				reg=
-				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst==0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst==0xf)
-				* (reg) + 
-				((inst==0x0)*0) + ((inst==0x3)*((reg + 1) & 0xf)) +
-				((inst==0x4)*((reg - 1) & 0xf)) + ((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
-				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) + ((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
+				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
+				((inst==0x0)*0) + 
+				((inst==0x3)*((reg + 1) & 0xf)) +
+				((inst==0x4)*((reg - 1) & 0xf)) + 
+				((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
+				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) + 
+				((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
 				/*facing is called in 0x0 and 0xb
 				* facing is used to determine which direction the cell is facing
 				*/
 				facing=
-				(inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x6||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
-				*(facing) + ((inst==0x0)*0)+((inst==0xb)*(reg & 3));
-				
+				(inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x6||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(facing) + 
+				((inst==0x0)*0)+
+				((inst==0xb)*(reg & 3));
+				/* pptr->genome[ptr_wordPtr]*/
+				pptr->genome[ptr_wordPtr]=
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
+				*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr)); 
 				/* If we're not in a false LOOP/REP, execute normally 
 				* in 0x6 it wanted us to change the genome so we have to do it every single time. 
 				* this was used in case 0x6 and left the same in all other cases.
