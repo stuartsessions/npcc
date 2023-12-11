@@ -820,7 +820,7 @@ static void *run(void *targ)
 
 				
 
-				
+				/*
 				reg=
 				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
 				((inst==0x0)*0) + 
@@ -855,7 +855,7 @@ static void *run(void *targ)
 				switch(inst) {
 					case 0x0: /* ZERO: Zero VM state registers */
 						reg = 0;
-						ptr_wordPtr = 0;
+						//ptr_wordPtr = 0;
 						//ptr_shiftPtr = 0;
 						//facing = 0;
 						break;
@@ -876,7 +876,7 @@ static void *run(void *targ)
                         //      It resets itself to zero.
                         //      ptr_wordPtr tries to add 1 to itself. If that takes it
                         //      to POND_DEPTH_SYSWORDS, then it resets to zero.
-                        ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
+                        //ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
 
                         break;
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */ 
@@ -887,7 +887,7 @@ static void *run(void *targ)
                         // ptr_wordPtr decrements 1 when ptr_shiftPtr reaches 0. If 
                         // ptr_wordPtr is already zero, then it resets at
                         // POND_DEPTH_SYSWORDS-1 
-                        ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
+                        //ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
                         /* 
                         if (ptr_shiftPtr)
                                  ptr_shiftPtr -= 4;
