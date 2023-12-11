@@ -944,7 +944,8 @@ int main()
 			pond[x][y].energy = 0;
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i)
 				pond[x][y].genome[i] = ~((uintptr_t)0);
-
+		}	
+	}		
 	run((void *)0);
 
 	return 0;
