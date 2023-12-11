@@ -649,12 +649,13 @@ static void *run(void *targ)
 				* currentWord
 				* set in 0x6, 0xa, 0xc, 
 				*/
+				/*
 				currentWord=
 				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
 				((inst==0x6)*(pptr->genome[wordPtr]))+
 				//((inst==0xa)*())
 				((inst == 0xc)*(pptr->genome[wordPtr]));
-
+				*/
 
 
 				/* Keep track of execution frequencies for each instruction */
@@ -725,7 +726,7 @@ static void *run(void *targ)
                         pptr->genome[ptr_wordPtr]=(pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
 */
 						
-                        //currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
+                        currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
 						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
@@ -794,7 +795,7 @@ static void *run(void *targ)
 						tmp = reg;
 						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
-						//currentWord = pptr->genome[wordPtr];
+						currentWord = pptr->genome[wordPtr];
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
 						tmpptr = getNeighbor(x,y,facing);
