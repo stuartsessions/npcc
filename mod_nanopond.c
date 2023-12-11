@@ -878,7 +878,7 @@ static void *run(void *targ)
                         //      to POND_DEPTH_SYSWORDS, then it resets to zero.
                         ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
 
-                        break;g
+                        break;
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */ 
                         
                         // ptr_shiftPtr decrements 4 until it reaches zero, and then
