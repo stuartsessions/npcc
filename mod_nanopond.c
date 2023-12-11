@@ -793,8 +793,11 @@ static void *run(void *targ)
 				else if (inst == 0xa) /* Decrement on REP */
 					--falseLoopDepth;
 			} else {
-				
-				pptr->genome[ptr_wordPtr]=(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr));                 /* If we're not in a false LOOP/REP, execute normally */
+
+
+                ptr_shiftPtr=((inst==0x0||inst==0x3||inst==0x4||inst==0x5||inst==0x6||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(ptr_shiftPtr))+((inst==0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS))+(inst==0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
+
+    pptr->genome[ptr_wordPtr]=(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr));                 /* If we're not in a false LOOP/REP, execute normally */
 				
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
@@ -820,7 +823,7 @@ static void *run(void *targ)
 
                         // ptr_shiftPtr increments by 4 to simulate a forward pointer, and
                         // if it gets to be bigger than SYSWORD_BITS, it resets to zero. 
-                        ptr_shiftPtr=(ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS);
+                        //ptr_shiftPtr=(ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS);
                         // If ptr_shiftPtr +=4 goes beyond SYSWORD_Bits:
                         //      It resets itself to zero.
                         //      ptr_wordPtr tries to add 1 to itself. If that takes it
@@ -832,8 +835,8 @@ static void *run(void *targ)
                         
                         // ptr_shiftPtr decrements 4 until it reaches zero, and then
                         // it resets at SYSWORD_BITS - 4
-                        ptr_shiftPtr=((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4;
-                        // ptr_wordPtr decrements 1 when ptr_shiftPtr reaches 0. If 
+                       // ptr_shiftPtr=((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4;
+                       // ptr_wordPtr decrements 1 when ptr_shiftPtr reaches 0. If 
                         // ptr_wordPtr is already zero, then it resets at
                         // POND_DEPTH_SYSWORDS-1 
                         ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
@@ -873,21 +876,9 @@ static void *run(void *targ)
 						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
 						break;
 					case 0x9: /* LOOP: Jump forward to matching REP if register is zero */
-					    /*	
-                        if (reg) {
-							if (loopStackPtr >= POND_DEPTH)
-                                stop = 1; // Stack overflow ends execution
-							else {
-								loopStack_wordPtr[loopStackPtr] = wordPtr;
-								loopStack_shiftPtr[loopStackPtr] = shiftPtr;
-								++loopStackPtr;
-							}
-						} else falseLoopDepth = 1;
-				        */
-                        // stop gets set to 1 if there is a value in the register, but
-                        // the loopStackPtr >= POND_DEPTH (A stack overflow)
+// stop gets set to 1 if there is a value in the register, but the loopStackPtr >= POND_DEPTH (A stack overflow)
                         stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
-                        // loopStack_wordPtr[loopStackPtr] gets set to the current
+// loopStack_wordPtr[loopStackPtr] gets set to the current
                         // wordPtr if there is a value in the register and there is no
                         // Stack overflow.
                         loopStack_wordPtr[loopStackPtr]=loopStack_wordPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(wordPtr*(reg&&(loopStackPtr<POND_DEPTH)));
@@ -914,22 +905,6 @@ static void *run(void *targ)
 							}
 						}
 						break;
-					
-                                /*
-					case 0xa: // REP: Jump back to matching LOOP if register is nonzero
-						int condition1 = loopStackPtr > 0;
-						int condition2 = reg != 0;
-						uintptr_t newLoopStackPtr = loopStackPtr - condition1;
-						uintptr_t newWordPtr = condition1 * condition2 * loopStack_wordPtr[newLoopStackPtr] + (1 - condition1 * condition2) * wordPtr;
-						uintptr_t newShiftPtr = condition1 * condition2 * loopStack_shiftPtr[newLoopStackPtr] + (1 - condition1 * condition2) * shiftPtr;
-						uintptr_t newCurrentWord = condition1 * condition2 * pptr->genome[newWordPtr] + (1 - condition1 * condition2) * currentWord;
-						loopStackPtr = newLoopStackPtr;
-						wordPtr = newWordPtr;
-						shiftPtr = newShiftPtr;
-						currentWord = newCurrentWord;
-						if (condition1 * condition2) continue;
-						break;
-                        */
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						facing = reg & 3;
 						break;
@@ -967,18 +942,6 @@ static void *run(void *targ)
      
                         tmpptr->generation = tmpptr->generation * (access_var);
                         break;
-				/*
-					case 0xe: // SHARE: Equalize energy between self and neighbor if allowed 
-						tmpptr = getNeighbor(x,y,facing);
-						if (accessAllowed(tmpptr,reg,1)) {
-							if (tmpptr->generation > 2)
-								++statCounters.viableCellShares;
-							tmp = pptr->energy + tmpptr->energy;
-							tmpptr->energy = tmp / 2;
-							pptr->energy = tmp - tmpptr->energy;
-						}
-						break; 
-				*/
 					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
 						int access = accessAllowed(tmpptr,reg,1);
