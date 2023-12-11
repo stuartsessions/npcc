@@ -725,7 +725,7 @@ static void *run(void *targ)
                         pptr->genome[ptr_wordPtr]=(pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
 */
 						
-                        currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
+                        //currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
 						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
