@@ -649,13 +649,13 @@ static void *run(void *targ)
 				* currentWord
 				* set in 0x6, 0xa, 0xc, 
 				*/
-				/*
+				
 				currentWord=
-				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
-				((inst==0x6)*(pptr->genome[wordPtr]))+
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst == 0xc || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
+				((inst==0x6)*(pptr->genome[wordPtr]));
 				//((inst==0xa)*())
-				((inst == 0xc)*(pptr->genome[wordPtr]));
-				*/
+				//((inst == 0xc)*(pptr->genome[wordPtr]));
+				
 
 
 				/* Keep track of execution frequencies for each instruction */
