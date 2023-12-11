@@ -671,6 +671,14 @@ static void *run(void *targ)
 				//((inst==0xa)*())
 				//((inst == 0xc)*(pptr->genome[wordPtr]));
 				
+				/*
+				* stop
+				* set in 0x9 & 0xf
+				*/
+				stop=
+				(inst = 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe)*(stop)+
+				((inst == 0x9)*(stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH))))+
+				((inst == 0xf)*(1));
 
 
 				/* Keep track of execution frequencies for each instruction */
@@ -763,7 +771,7 @@ static void *run(void *targ)
 				        */
                         // stop gets set to 1 if there is a value in the register, but
                         // the loopStackPtr >= POND_DEPTH (A stack overflow)
-                        stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
+                        //stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
                         // loopStack_wordPtr[loopStackPtr] gets set to the current
                         // wordPtr if there is a value in the register and there is no
                         // Stack overflow.
@@ -837,7 +845,7 @@ static void *run(void *targ)
 						pptr->energy = newEnergySelf;
 						break; 
 					case 0xf: /* STOP: End execution */
-						stop = 1;
+						//stop = 1;
 						break;
 				}
 			}
