@@ -680,6 +680,14 @@ static void *run(void *targ)
 				((inst == 0x9)*(stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH))))+
 				((inst == 0xf)*(1));
 
+				/*
+				* loopStack_wordPtr[loopStackPtr]
+				* loopStack_wordPtr[loopStackPtr] set in 0x9, 0xa
+				* TODO: 0xa
+				*/
+				loopStack_wordPtr[loopStackPtr]=
+				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(loopStack_wordPtr[loopStackPtr])+
+				((inst == 0x9)*(loopStack_wordPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(wordPtr*(reg&&(loopStackPtr<POND_DEPTH)))));
 
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
@@ -771,11 +779,16 @@ static void *run(void *targ)
 				        */
                         // stop gets set to 1 if there is a value in the register, but
                         // the loopStackPtr >= POND_DEPTH (A stack overflow)
-                        //stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
-                        // loopStack_wordPtr[loopStackPtr] gets set to the current
+                        
+						// real line
+						//stop=stop*!(reg&&(loopStackPtr>=POND_DEPTH))+(reg&&(loopStackPtr>=POND_DEPTH));
+                        
+						// loopStack_wordPtr[loopStackPtr] gets set to the current
                         // wordPtr if there is a value in the register and there is no
                         // Stack overflow.
-                        loopStack_wordPtr[loopStackPtr]=loopStack_wordPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(wordPtr*(reg&&(loopStackPtr<POND_DEPTH)));
+
+						// this is a real line below
+                        //loopStack_wordPtr[loopStackPtr]=loopStack_wordPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(wordPtr*(reg&&(loopStackPtr<POND_DEPTH)));
                         
                         // loopStack_shiftPtr[loopStackPtr] gets set to the current
                         // shiftPtr if there is a value in the register and there is no
