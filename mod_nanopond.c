@@ -850,7 +850,7 @@ static void *run(void *targ)
                 // var = (i==0x1){A} + (i==0x2){B} + ...	
 				switch(inst) {
 					case 0x0: /* ZERO: Zero VM state registers */
-						reg = 0;
+						//reg = 0;
 						//ptr_wordPtr = 0;
 						//ptr_shiftPtr = 0;
 						//facing = 0;
