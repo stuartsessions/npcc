@@ -804,7 +804,7 @@ static void *run(void *targ)
 				((inst==0x0)*0) + 
 				//((inst==0x3)*((reg + 1) & 0xf)) +
 				//((inst==0x4)*((reg - 1) & 0xf)) +
-				((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
+				//((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
 				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
 				((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
 				/*facing is called in 0x0 and 0xb
@@ -884,7 +884,7 @@ static void *run(void *targ)
 						reg = (reg - 1) & 0xf;
 						break;
 					case 0x5: /* READG: Read into the register from genome */
-						//reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x6: /* WRITEG: Write out from the register to genome */
                         
