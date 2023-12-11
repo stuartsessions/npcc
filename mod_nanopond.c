@@ -817,7 +817,7 @@ static void *run(void *targ)
 				((inst == 0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS)))+
 				((inst == 0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
 
-				/*
+				
 				reg=
 				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
 				((inst==0x0)*0) + 
@@ -897,13 +897,13 @@ static void *run(void *targ)
                        */
                         break;
 					case 0x3: /* INC: Increment the register */
-						reg = (reg + 1) & 0xf;
+						//reg = (reg + 1) & 0xf;
 						break;
 					case 0x4: /* DEC: Decrement the register */
-						reg = (reg - 1) & 0xf;
+						//reg = (reg - 1) & 0xf;
 						break;
 					case 0x5: /* READG: Read into the register from genome */
-						reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						//reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x6: /* WRITEG: Write out from the register to genome */
                         
@@ -914,7 +914,7 @@ static void *run(void *targ)
                         currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
-						reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x8: /* WRITEB: Write out from the register to buffer */
 						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
@@ -994,7 +994,7 @@ static void *run(void *targ)
                         shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
  
 						tmp = reg;
-						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
