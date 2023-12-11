@@ -798,6 +798,15 @@ static void *run(void *targ)
 				* reg is called in 0x0, 0x3, 0x4, 0x5, 0x7, 0xc
 				* 
 				*/
+
+				/*
+				* ptr_shiftPtr
+				*/
+				ptr_shiftPtr = 
+				(inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf) * (ptr_shiftPtr) +
+				((inst == 0x0)*0)+
+				((inst == 0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS)))+
+				((inst == 0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
 				/*
 				* ptr_wordPtr
 				* set in 0x0, 0x1, 0x2
@@ -808,14 +817,7 @@ static void *run(void *targ)
 				((inst == 0x1)*((ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))))+
 				((inst == 0x2)*((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4)));
 
-				/*
-				* ptr_shiftPtr
-				*/
-				ptr_shiftPtr = 
-				(inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf) * (ptr_shiftPtr) +
-				((inst == 0x0)*0)+
-				((inst == 0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS)))+
-				((inst == 0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
+				
 
 				
 				reg=
