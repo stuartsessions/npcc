@@ -811,6 +811,7 @@ static void *run(void *targ)
 				* ptr_wordPtr
 				* set in 0x0, 0x1, 0x2
 				*/
+				/*
 				ptr_wordPtr =
 				(inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf) * (ptr_wordPtr) +
 				((inst == 0x0)*0)+
@@ -828,6 +829,7 @@ static void *run(void *targ)
 				((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
 				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
 				((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
+				*/
 				/*facing is called in 0x0 and 0xb
 				* facing is used to determine which direction the cell is facing
 				*/
@@ -852,8 +854,8 @@ static void *run(void *targ)
                 // var = (i==0x1){A} + (i==0x2){B} + ...	
 				switch(inst) {
 					case 0x0: /* ZERO: Zero VM state registers */
-						//reg = 0;
-						//ptr_wordPtr = 0;
+						reg = 0;
+						ptr_wordPtr = 0;
 						//ptr_shiftPtr = 0;
 						//facing = 0;
 						break;
@@ -874,9 +876,9 @@ static void *run(void *targ)
                         //      It resets itself to zero.
                         //      ptr_wordPtr tries to add 1 to itself. If that takes it
                         //      to POND_DEPTH_SYSWORDS, then it resets to zero.
-                        //ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
+                        ptr_wordPtr=(ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS));
 
-                        break;
+                        break;g
 					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */ 
                         
                         // ptr_shiftPtr decrements 4 until it reaches zero, and then
@@ -885,7 +887,7 @@ static void *run(void *targ)
                         // ptr_wordPtr decrements 1 when ptr_shiftPtr reaches 0. If 
                         // ptr_wordPtr is already zero, then it resets at
                         // POND_DEPTH_SYSWORDS-1 
-                        //ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
+                        ptr_wordPtr=((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4));
                         /* 
                         if (ptr_shiftPtr)
                                  ptr_shiftPtr -= 4;
@@ -899,13 +901,13 @@ static void *run(void *targ)
                        */
                         break;
 					case 0x3: /* INC: Increment the register */
-						//reg = (reg + 1) & 0xf;
+						reg = (reg + 1) & 0xf;
 						break;
 					case 0x4: /* DEC: Decrement the register */
-						//reg = (reg - 1) & 0xf;
+						reg = (reg - 1) & 0xf;
 						break;
 					case 0x5: /* READG: Read into the register from genome */
-						//reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x6: /* WRITEG: Write out from the register to genome */
                         
@@ -916,7 +918,7 @@ static void *run(void *targ)
                         currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
-						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x8: /* WRITEB: Write out from the register to buffer */
 						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
@@ -996,7 +998,7 @@ static void *run(void *targ)
                         shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
  
 						tmp = reg;
-						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
