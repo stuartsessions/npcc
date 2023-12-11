@@ -805,8 +805,8 @@ static void *run(void *targ)
 				((inst==0x3)*((reg + 1) & 0xf)) +
 				((inst==0x4)*((reg - 1) & 0xf)) + 
 				((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
-				((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)); 
-				//+((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
+				//((inst==0x7)*((outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf))
+				((inst==0xc)*((pptr->genome[wordPtr] >> shiftPtr) & 0xf));
 				/*facing is called in 0x0 and 0xb
 				* facing is used to determine which direction the cell is facing
 				*/
@@ -895,7 +895,7 @@ static void *run(void *targ)
                         currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
-						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x8: /* WRITEB: Write out from the register to buffer */
 						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
@@ -975,7 +975,7 @@ static void *run(void *targ)
                         shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
  
 						tmp = reg;
-						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
