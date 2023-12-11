@@ -795,16 +795,21 @@ static void *run(void *targ)
 			} else {
 
 				/*
-				* reg is called in 0x0, 0x2, 0x3, 0x4, 0x5, 0x7, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe
+				* reg is called in 0x0, 0x3, 0x4, 0x5, 0x7, 0xc, 0xe
 				* 
 				*/
+				reg=
+				(inst=0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst==0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst==0xf)
+				* (reg) + ((inst==0x0)*0)+ ((inst==0x3)*(reg + 1) & 0xf) +
+				((inst==0x4)*(reg - 1) & 0xf) + ((inst==0x5)*((pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf)) +
+				((inst==0x7)*(outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf) + ((inst==0xc)*(pptr->genome[wordPtr] >> shiftPtr) & 0xf) + ((inst==0xe)*(pptr->parentID));
 				/*facing is called in 0x0 and 0xb
 				* facing is used to determine which direction the cell is facing
 				*/
 				facing=
 				(inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x6||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
 				*(facing) + ((inst==0x0)*0)+((inst==0xb)*(reg & 3));
-				/* CASE 0x6*/
+				/* pptr->genome[ptr_wordPtr]*/
 				pptr->genome[ptr_wordPtr]=
 				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
 				*(pptr->genome[ptr_wordPtr])+((inst==0x6)*((pptr->genome[ptr_wordPtr]&~(((uintptr_t)0xf)<<ptr_shiftPtr))|reg<<ptr_shiftPtr)); 
@@ -821,10 +826,10 @@ static void *run(void *targ)
                 // var = (i==0x1){A} + (i==0x2){B} + ...	
 				switch(inst) {
 					case 0x0: /* ZERO: Zero VM state registers */
-						reg = 0;
+						//reg = 0;
 						ptr_wordPtr = 0;
 						ptr_shiftPtr = 0;
-						facing = 0;
+						//facing = 0;
 						break;
 					case 0x1: /* FWD: Increment the pointer (wrap at end) */
                         /*
@@ -868,13 +873,13 @@ static void *run(void *targ)
                        */
                         break;
 					case 0x3: /* INC: Increment the register */
-						reg = (reg + 1) & 0xf;
+						//reg = (reg + 1) & 0xf;
 						break;
 					case 0x4: /* DEC: Decrement the register */
-						reg = (reg - 1) & 0xf;
+						//reg = (reg - 1) & 0xf;
 						break;
 					case 0x5: /* READG: Read into the register from genome */
-						reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						//reg = (pptr->genome[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x6: /* WRITEG: Write out from the register to genome */
                         
@@ -885,7 +890,7 @@ static void *run(void *targ)
                         currentWord = pptr->genome[wordPtr]; /* Must refresh in case this changed! */
 						break;
 					case 0x7: /* READB: Read into the register from buffer */
-						reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
+						//reg = (outputBuf[ptr_wordPtr] >> ptr_shiftPtr) & 0xf;
 						break;
 					case 0x8: /* WRITEB: Write out from the register to buffer */
 						outputBuf[ptr_wordPtr]=(outputBuf[ptr_wordPtr]&~(((uintptr_t)0xf) << ptr_shiftPtr))|reg << ptr_shiftPtr;
@@ -949,7 +954,7 @@ static void *run(void *targ)
 						break;
                         */
 					case 0xb: /* TURN: Turn in the direction specified by register */
-						facing = reg & 3;
+						//facing = reg & 3;
 						break;
 					case 0xc: /* XCHG: Skip next instruction and exchange value of register with it */
 						// increment wordptr by 1 if the shift Ptr is going to go
@@ -965,7 +970,7 @@ static void *run(void *targ)
                         shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
  
 						tmp = reg;
-						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
