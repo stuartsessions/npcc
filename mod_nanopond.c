@@ -531,6 +531,7 @@ static void *run(void *targ)
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i) 
 				pptr->genome[i] = getRandom();
 			++cellIdCounter;
+		
 		}
 
 		/* Pick a random cell to execute */
@@ -909,6 +910,7 @@ static void *run(void *targ)
 			}
 		}
 	}
+
 	return (void *)0;
 }
 
@@ -942,8 +944,8 @@ int main()
 			pond[x][y].energy = 0;
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i)
 				pond[x][y].genome[i] = ~((uintptr_t)0);
-		}
-	}
+
+	run((void *)0);
 
 	return 0;
 }
