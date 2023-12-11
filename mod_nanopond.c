@@ -696,6 +696,15 @@ static void *run(void *targ)
 				loopStack_shiftPtr[loopStackPtr]=
 				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(loopStack_shiftPtr[loopStackPtr])+
 				((inst == 0x9) * (loopStack_shiftPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(shiftPtr*(reg&&(loopStackPtr<POND_DEPTH)))));
+				
+				/*
+				* loopStackPtr
+				* set in 0x9
+				*/
+				loopStackPtr=
+				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(loopStackPtr)+
+				((inst == 0x9)*(loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH))));
+				
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
 			    
@@ -804,7 +813,8 @@ static void *run(void *targ)
                         // real line
 						//loopStack_shiftPtr[loopStackPtr]=loopStack_shiftPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(shiftPtr*(reg&&(loopStackPtr<POND_DEPTH)));
 
-                        loopStackPtr = loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH));
+						//real lines
+                        //loopStackPtr = loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH));
                         falseLoopDepth = !reg;
                         
                         break;
