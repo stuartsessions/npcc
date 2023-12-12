@@ -265,9 +265,12 @@
 #include <string.h>
 #include <time.h>
 
+#define PRECALC_NUMS 1000  // Number of precalculated numbers
+static uintptr_t precalc_random_nums[PRECALC_NUMS];
+static int random_idx = 0;
 
 volatile uint64_t prngState[2];
-static inline uintptr_t getRandom()
+static inline uintptr_t getRandomPre()
 {
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
 	uint64_t x = prngState[0];
@@ -279,6 +282,17 @@ static inline uintptr_t getRandom()
 	return (uintptr_t)(z + y);
 }
 
+void precalculate_random_numbers() {
+    for (int i = 0; i < PRECALC_NUMS; i++) {
+        precalc_random_nums[i] = getRandomPre();
+    }
+    random_idx = 0;  // Reset the index
+}
+uintptr_t getRandom() {
+    uintptr_t num = precalc_random_nums[precalc_index];
+    precalc_index = (precalc_index + 1) % PRECALC_NUMS;  // Wrap around to the start of the array when we reach the end
+    return num;
+}
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
  * by two is due to the fact that there are two four-bit values in
@@ -955,12 +969,14 @@ static void *run(void *targ)
  */
 int main()
 {
+
 	uintptr_t i,x,y;
 
 	/* Seed and init the random number generator */
 	prngState[0] = 0; //(uint64_t)time(NULL);
 	srand(13);
 	prngState[1] = (uint64_t)rand();
+	precalculate_random_numbers()
 
 	/* Reset per-report stat counters */
 	for(x=0;x<sizeof(statCounters);++x)
