@@ -9,6 +9,9 @@ static uintptr_t buffer[BUFFER_SIZE];
 static int in = 0;
 static uintptr_t last_random_number;
 
+static uintptr_t pre_buffer[BUFFER_SIZE];
+static int pre_in = 0;
+
 volatile uint64_t prngState[2];
 
 static inline uintptr_t getRandomPre()
@@ -20,6 +23,11 @@ static inline uintptr_t getRandomPre()
 	x ^= x << 23;
 	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
 	prngState[1] = z;
+
+    pre_buffer[pre_in] = num;
+    pre_in = (pre_in + 1) % BUFFER_SIZE;
+
+
 	return (uintptr_t)(z + y);
 }
 void precalculate_random_numbers() {
@@ -36,9 +44,7 @@ static inline uintptr_t getRandom() {
 }
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
-    last_random_number = num;  // Store the last random number
-    uintptr_t new_num = getRandomPre();
-    buffer[in] = (new_num & -rollback) | (num & ~-rollback);  // Generate a new random number only if rollback is not zero
+    buffer[in] = pre_buffer[pre_in];  // Use the current random number from pre_buffer
     in = ((in + 1) & -rollback) | (in & ~-rollback);  // Roll back if rollback is zero
     return num;
 }
