@@ -829,65 +829,6 @@ static void *run(void *targ)
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
 
-				switch(inst) {
-					case 0x0: /* ZERO: Zero VM state registers */
-						break;
-					case 0x1: /* FWD: Increment the pointer (wrap at end) */
-                        break;
-					case 0x2: /* BACK: Decrement the pointer (wrap at beginning) */ 
-                        break;
-					case 0x3: /* INC: Increment the register */
-						break;
-					case 0x4: /* DEC: Decrement the register */
-						break;
-					case 0x5: /* READG: Read into the register from genome */
-						break;
-					case 0x6: /* WRITEG: Write out from the register to genome */
-						break;
-					case 0x7: /* READB: Read into the register from buffer */
-						break;
-					case 0x8: /* WRITEB: Write out from the register to buffer */
-						break;
-					case 0x9: /* LOOP: Jump forward to matching REP if register is zero */
-                        break;
-					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
-                        break;
-					case 0xb: /* TURN: Turn in the direction specified by register */
-						//facing = reg & 3;
-						break;
-					case 0xc: /* XCHG: Skip next instruction and exchange value of register with it */
-//                        wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
-//                        shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
-						//tmp = reg;
-						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
-						//pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
-						//currentWord = pptr->genome[wordPtr];
-						break;
-					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
-						//tmpptr = getNeighbor(x,y,facing);
-						//int access_var = accessAllowed(tmpptr,reg,0, 1);
-                        //statCounters.viableCellsKilled=statCounters.viableCellsKilled+(access_var)*(tmpptr->generation>2);
-                        //tmpptr->genome[0] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
-                        //tmpptr->genome[1] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
-                        //tmpptr->ID = tmpptr->ID * !(access_var)+ (access_var)*cellIdCounter;
-                       // tmpptr->parentID = tmpptr->parentID * !(access_var);
-                        //tmpptr->lineage = tmpptr->lineage * !(access_var) + (access_var)*cellIdCounter;
-                       // cellIdCounter=cellIdCounter * !(access_var) + (access_var)* cellIdCounter;
-                        //tmp = (access_var) + (tmpptr->generation>2)*!(access_var)*(pptr->energy / FAILED_KILL_PENALTY);
-                        //pptr->energy = pptr->energy+!(access_var)*(tmpptr->generation>2)*(-pptr->energy) + !(access_var)*(tmpptr->generation>2)*(pptr->energy-tmp);
-						//tmpptr->generation = tmpptr->generation * (access_var);
-                        break;
-					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
-						//tmpptr = getNeighbor(x,y,facing);
-						//int access = accessAllowed(tmpptr,reg,1,1);
-						//tmp = pptr->energy + tmpptr->energy;
-						//statCounters.viableCellShares += access * (tmpptr->generation > 2);
-						//tmpptr->energy = (access * (tmp / 2) + (1 - access) * tmpptr->energy);
-						//pptr->energy = (access * (tmp - (access * (tmp / 2) + (1 - access) * tmpptr->energy)) + (1 - access) * pptr->energy);
-						break; 
-					case 0xf: /* STOP: End execution */
-						break;
-				}
 			}
 			
 			/* Advance the shift and word pointers, and loop around
