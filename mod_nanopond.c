@@ -288,7 +288,7 @@ void precalculate_random_numbers() {
     }
     random_idx = 0;  // Reset the index
 }
-uintptr_t getRandom() {
+static inline uintptr_t getRandom() {
     uintptr_t num = precalc_random_nums[random_idx];
     random_idx = (random_idx + 1) % PRECALC_NUMS;  // Wrap around to the start of the array when we reach the end
     return num;
