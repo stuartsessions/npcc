@@ -704,10 +704,10 @@ static void *run(void *targ)
 				* TODO: 0xa, 0xc
 				*/
 				currentWord=
-				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9|| inst==0xb|| inst == 0xc || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9|| inst==0xb || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
 				((inst==0x6)*(pptr->genome[wordPtr]))+
-				((inst==0xa)*(currentWord*!(reg&&loopStackPtr)+(pptr->genome[wordPtr])*(reg&&loopStackPtr)));
-				//((inst == 0xc)*(pptr->genome[wordPtr]));
+				((inst==0xa)*(currentWord*!(reg&&loopStackPtr)+(pptr->genome[wordPtr])*(reg&&loopStackPtr)))+
+				((inst == 0xc)*(pptr->genome[wordPtr]));
 				
                 /*
 				* stop
@@ -861,7 +861,7 @@ static void *run(void *targ)
 						//tmp = reg;
 						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						//pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
-						currentWord = pptr->genome[wordPtr];
+						//currentWord = pptr->genome[wordPtr];
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
 						//tmpptr = getNeighbor(x,y,facing);
