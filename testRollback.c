@@ -66,10 +66,10 @@ int main() {
     // Precalculate random numbers
     precalculate_random_numbers();
 
-    uintptr_t numrollback = getRandomRollback(0);   // one number
+    uintptr_t numrollback = getRandomRollback(1);   // one number
     uintptr_t numrollback2 = getRandomRollback(0); // two number
     uintptr_t numrollback3 = getRandomRollback(1);  // go back one 
-    uintptr_t numrollback4 = getRandomRollback(0);  // go back one 
+    uintptr_t numrollback4 = getRandomRollback(1);  // go back one 
     
     uintptr_t numroll = getRandomPreOG();   // one number
     uintptr_t numroll2 = getRandomPreOG();   //two number
