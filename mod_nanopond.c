@@ -265,7 +265,7 @@
 #include <string.h>
 #include <time.h>
 
-#define PRECALC_NUMS 1000000  // Number of precalculated numbers
+#define PRECALC_NUMS 1000000000  // Number of precalculated numbers
 static uintptr_t precalc_random_nums[PRECALC_NUMS];
 static int random_idx = 0;
 
@@ -290,7 +290,7 @@ void precalculate_random_numbers() {
 }
 static inline uintptr_t getRandom() {
     uintptr_t num = precalc_random_nums[random_idx];
-    random_idx = (random_idx + 1);  // Wrap around to the start of the array when we reach the end
+    random_idx = (random_idx + 1);
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
