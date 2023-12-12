@@ -289,11 +289,12 @@ void precalculate_random_numbers() {
     }
 }
 /*
-static inline uintptr_t getRandom() {
+static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-	buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
-    in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
+    uintptr_t new_num = getRandomPre(rollback);
+    buffer[in] = (new_num & -rollback) | (num & ~-rollback);
+    in = ((in + 1) & -rollback) | (in & ~-rollback);
     return num;
 }
 */
@@ -302,7 +303,7 @@ static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     last_random_number = num;  // Store the last random number
     uintptr_t new_num = getRandomPre(rollback);
     buffer[in] = (new_num & -rollback) | (num & ~-rollback);
-    in = ((in + 1) & -rollback) | (in & ~-rollback);
+    in = (((in + 1) & -rollback) | (in & ~-rollback)) % BUFFER_SIZE;
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
