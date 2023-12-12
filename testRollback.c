@@ -4,10 +4,12 @@
 #include <string.h>
 #include <time.h>
 
+
 #define BUFFER_SIZE 1000  // Size of the circular buffer
 static uintptr_t buffer[BUFFER_SIZE];
 static int in = 0;
-static uintptr_t last_random_number;
+static int next_in = 0;
+
 
 volatile uint64_t prngState[2];
 volatile uint64_t prngStateOG[2];
@@ -46,6 +48,7 @@ static inline uintptr_t getRandom() {
     in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
 }
+/*
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
@@ -53,8 +56,15 @@ static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
     return num;
 }
+*/
 
-
+static inline uintptr_t getRandomRollback(uintptr_t rollback) {
+    uintptr_t num = buffer[in];
+    buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
+    in = next_in;  // Use the next index
+    next_in = ((next_in + 1) % BUFFER_SIZE) * rollback + next_in * (!rollback);  // Update the next index only if rollback is not zero
+    return num;
+}
 int main() {
     // Initialize the PRNG state
     prngState[0] = 13;
