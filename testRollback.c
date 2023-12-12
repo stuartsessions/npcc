@@ -10,7 +10,19 @@ static int in = 0;
 static uintptr_t last_random_number;
 
 volatile uint64_t prngState[2];
+volatile uint64_t prngStateOG[2];
 
+static inline uintptr_t getRandomPreOG()
+{
+	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
+	uint64_t x = prngStateOG[0];
+	const uint64_t y = prngStateOG[1];
+	prngState[0] = y;
+	x ^= x << 23;
+	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
+	prngState[1] = z;
+	return (uintptr_t)(z + y);
+}
 static inline uintptr_t getRandomPre()
 {
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
@@ -48,17 +60,24 @@ int main() {
     prngState[0] = 13;
     prngState[1] = 0xDEADBEEF;
 
+    prngStateOG[0] = 13;
+    prngStateOG[1] = 0xDEADBEEF;
+
     // Precalculate random numbers
     precalculate_random_numbers();
 
-    uintptr_t numrollback = getRandomRollback(1);  
+    uintptr_t numrollback = getRandomRollback(1);   // one number
+    uintptr_t numrollback2 = getRandomRollback(1); // two number
+    uintptr_t numrollback3 = getRandomRollback(0);  // go back one 
+    uintptr_t numrollback4 = getRandomRollback(1);  // go back one 
     
-    uintptr_t numroll = getRandomRollback(0);  
+    uintptr_t numroll = getRandomPreOG();   // one number
+    uintptr_t numroll2 = getRandomPreOG();   //two number
+    uintptr_t numroll3 = getRandomPreOG();   //three number
     
-    numroll = getRandomRollback(1);  
-        //uintptr_t numpre = getRandomPre();
-        //uintptr_t num = getRandom();
-    printf("numroll: %lu, numrollback: %lu\n", numroll, numrollback);
+
+    printf("numrollback: %lu, numrollback2: %lu, numrollback3 = %lu, numrollback4 = %lu\n", numrollback, numrollback2, numrollback3, numrollback4);
+    printf("numroll: %lu, numroll2: %lu, numrollback3 = %lu\n", numroll, numroll2, numroll3);
 
     
 
