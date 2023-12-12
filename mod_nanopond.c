@@ -285,7 +285,7 @@ static inline uintptr_t getRandomPre(int rollback)
 }
 void precalculate_random_numbers() {
     for (int i = 0; i < BUFFER_SIZE; i++) {
-        buffer[i] = getRandomPre();
+        buffer[i] = getRandomPre(1);
     }
 }
 /*
