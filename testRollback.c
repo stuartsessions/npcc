@@ -9,9 +9,6 @@ static uintptr_t buffer[BUFFER_SIZE];
 static int in = 0;
 static uintptr_t last_random_number;
 
-static uintptr_t pre_buffer[BUFFER_SIZE];
-static int pre_in = 0;
-
 volatile uint64_t prngState[2];
 
 static inline uintptr_t getRandomPre()
@@ -58,7 +55,7 @@ int main() {
         uintptr_t numrollback = getRandomRollback(1);  
         uintptr_t numpre = getRandomPre();
         uintptr_t num = getRandom();
-        print("num: %d, numpre: %d, numrollback: %d\n", num, numpre, numrollback);
+        print("num: %lu, numpre: %lu, numrollback: %lu\n", num, numpre, numrollback);
     }
     return 0;
 }
