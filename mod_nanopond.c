@@ -976,7 +976,7 @@ int main()
 	prngState[0] = 0; //(uint64_t)time(NULL);
 	srand(13);
 	prngState[1] = (uint64_t)rand();
-	precalculate_random_numbers()
+	precalculate_random_numbers();
 
 	/* Reset per-report stat counters */
 	for(x=0;x<sizeof(statCounters);++x)
