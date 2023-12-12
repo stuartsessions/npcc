@@ -265,9 +265,11 @@
 #include <string.h>
 #include <time.h>
 
-#define PRECALC_NUMS 1000000 // Number of precalculated numbers
-static uintptr_t precalc_random_nums[PRECALC_NUMS];
-static int random_idx = 0;
+#define BUFFER_SIZE 1000  // Size of the circular buffer
+static uintptr_t buffer[BUFFER_SIZE];
+static int index = 0;
+static uintptr_t last_random_number;
+
 
 volatile uint64_t prngState[2];
 static inline uintptr_t getRandomPre()
@@ -283,19 +285,18 @@ static inline uintptr_t getRandomPre()
 }
 
 void precalculate_random_numbers() {
-    for (int i = 0; i < PRECALC_NUMS; i++) {
-        precalc_random_nums[i] = getRandomPre();
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        buffer[i] = getRandomPre();
     }
-    random_idx = 0;  // Reset the index
 }
+
 static inline uintptr_t getRandom() {
-	if (random_idx == PRECALC_NUMS) {
-		precalculate_random_numbers();
-	}
-    uintptr_t num = precalc_random_nums[random_idx];
-    random_idx = (random_idx + 1);
+    buffer[index] = getRandomPre();  // Generate a new random number and add it to the buffer
+    uintptr_t num = buffer[index];
+    last_random_number = num;  // Store the last random number
+    index = (index + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
-}
+	
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
  * by two is due to the fact that there are two four-bit values in
