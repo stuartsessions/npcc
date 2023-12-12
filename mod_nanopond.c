@@ -459,9 +459,9 @@ static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, con
     return &pond[newX][newY];
 }
 
-static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
+static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense, int rollback)
 {
-	uintptr_t random = (uintptr_t)(getRandomRollback(1) & 0xf);
+	uintptr_t random = (uintptr_t)(getRandomRollback(rollback) & 0xf);
     /* Access permission is more probable if they are more similar in sense 0,
 	 * and more probable if they are different in sense 1. Sense 0 is used for
 	 * "negative" interactions and sense 1 for "positive" ones. */
@@ -793,7 +793,7 @@ static void *run(void *targ)
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
 						tmpptr = getNeighbor(x,y,facing);
-						int access_var = accessAllowed(tmpptr,reg,0);
+						int access_var = accessAllowed(tmpptr,reg,0, 1);
                         statCounters.viableCellsKilled=statCounters.viableCellsKilled+(access_var)*(tmpptr->generation>2);
                         tmpptr->genome[0] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
                         tmpptr->genome[1] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
@@ -807,7 +807,7 @@ static void *run(void *targ)
                         break;
 					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
-						int access = accessAllowed(tmpptr,reg,1);
+						int access = accessAllowed(tmpptr,reg,1,1);
 						tmp = pptr->energy + tmpptr->energy;
 						statCounters.viableCellShares += access * (tmpptr->generation > 2);
 						tmpptr->energy = (access * (tmp / 2) + (1 - access) * tmpptr->energy);
@@ -867,7 +867,7 @@ static void *run(void *targ)
 		if ((outputBuf[0] & 0xff) != 0xff) {
 			tmpptr = getNeighbor(x,y,facing);
 
-			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0)) {
+			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0, 1)) {
 				/* Log it if we're replacing a viable cell */
 				if (tmpptr->generation > 2)
 					++statCounters.viableCellsReplaced;
