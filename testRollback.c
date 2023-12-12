@@ -51,11 +51,14 @@ int main() {
     // Precalculate random numbers
     precalculate_random_numbers();
 
+    uintptr_t numrollback = getRandomRollback(1);  
+    
     for (int i = 0; i < 2000; ++i) {
+        uintptr_t numroll = getRandomRollback(0);  
         uintptr_t numrollback = getRandomRollback(1);  
         //uintptr_t numpre = getRandomPre();
         //uintptr_t num = getRandom();
-        printf("numrollback: %lu\n", numrollback);
+        printf("numroll: %lu, numrollback: %lu\n", numroll, numrollback);
 
     }
 
