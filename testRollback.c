@@ -69,6 +69,6 @@ int main() {
         else {
             printf("Rollback does not work correctly\n");
             }
-
+    }
     return 0;
 }
