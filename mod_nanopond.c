@@ -290,7 +290,7 @@ void precalculate_random_numbers() {
 }
 static inline uintptr_t getRandom() {
     uintptr_t num = precalc_random_nums[random_idx];
-    random_idx = (random_idx + 1) % PRECALC_NUMS;  // Wrap around to the start of the array when we reach the end
+    random_idx = (random_idx + 1);  // Wrap around to the start of the array when we reach the end
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
@@ -976,6 +976,7 @@ int main()
 	prngState[0] = 0; //(uint64_t)time(NULL);
 	srand(13);
 	prngState[1] = (uint64_t)rand();
+	
 	precalculate_random_numbers();
 
 	/* Reset per-report stat counters */
