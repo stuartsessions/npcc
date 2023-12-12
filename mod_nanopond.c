@@ -670,7 +670,7 @@ static void *run(void *targ)
                 skip=(reg&&loopStackPtr)*(inst==0xa);
                 
                 reg=
-				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst==0xc || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
+				(inst == 0x1 || inst == 0x2 || inst == 0x6 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xd ||inst == 0xe || inst == 0xf) * (reg) + 
 				((inst==0x0)*0) + 
 				((inst==0x3)*((reg + 1) & 0xf)) +
 				((inst==0x4)*((reg - 1) & 0xf)) +
@@ -684,6 +684,7 @@ static void *run(void *targ)
 				(inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x6||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xc||inst==0xd||inst==0xe||inst==0xf)*(facing) + 
 				((inst==0x0)*0)+
 				((inst==0xb)*(reg & 3));
+
 				/* pptr->genome[ptr_wordPtr]*/
 				pptr->genome[ptr_wordPtr]=
 				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst==0xa||inst==0xb||inst==0xc||inst==0xd||inst==0xe||inst==0xf)
@@ -850,7 +851,7 @@ static void *run(void *targ)
 //                        wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
 //                        shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
 						//tmp = reg;
-						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
