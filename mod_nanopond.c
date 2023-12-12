@@ -270,6 +270,7 @@ static uintptr_t buffer[BUFFER_SIZE];
 static int in = 0;
 static uintptr_t last_random_number;
 
+volatile uint64_t prngState[2];
 
 static inline uintptr_t getRandomPre()
 {
