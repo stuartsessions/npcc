@@ -61,7 +61,7 @@ int main() {
             printf("%lu = %luy\n", num, num1);
             } 
         else {
-            printf("Rollback does not work correctly\n");
+            printf("%lu = %lu, Rollback does not work correctly\n", num, num1);
             }
     }
     return 0;
