@@ -296,7 +296,7 @@ static inline uintptr_t getRandom() {
     last_random_number = num;  // Store the last random number
     index = (index + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
-	
+}
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
  * by two is due to the fact that there are two four-bit values in
