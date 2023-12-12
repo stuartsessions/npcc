@@ -713,11 +713,8 @@ static void *run(void *targ)
 				* tmpptr
 				* set is 0xd, 0xe
 				*/
-				tmpptr = 
-				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xf) * (tmpptr)+
-				((inst == 0xd)*getNeighbor(x,y,facing))+
-				((inst == 0xe)*getNeighbor(x,y,facing));
-
+				tmpptr = getNeighbor(x,y,facing);
+				
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
 
