@@ -851,7 +851,7 @@ static void *run(void *targ)
 //                        wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
 //                        shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
 						//tmp = reg;
-						reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
+						//reg = (pptr->genome[wordPtr] >> shiftPtr) & 0xf;
 						pptr->genome[wordPtr]=((pptr->genome[wordPtr]&~(((uintptr_t)0xf) << shiftPtr))|tmp << shiftPtr);
 						currentWord = pptr->genome[wordPtr];
 						break;
