@@ -41,6 +41,7 @@ void precalculate_random_numbers() {
         buffer[i] = getRandomPre();
     }
 }
+/*
 static inline uintptr_t getRandom() {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
@@ -48,6 +49,7 @@ static inline uintptr_t getRandom() {
     in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
 }
+*/
 /*
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
