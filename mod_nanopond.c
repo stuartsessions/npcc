@@ -552,6 +552,7 @@ static void *run(void *targ)
 		facing = 0;
 		falseLoopDepth = 0;
 		stop = 0;
+		int skip=0;
 
 		/* We use a currentWord buffer to hold the word we're
 		 * currently working on.  This speeds things up a bit
@@ -568,6 +569,7 @@ static void *run(void *targ)
 		while ((pptr->energy)&&(!stop)) {
 			/* Get the next instruction */
 			inst = (currentWord >> shiftPtr) & 0xf;
+			skip=0;
 
 			/* Randomly frob either the instruction or the register with a
 			 * probability defined by MUTATION_RATE. This introduces variation,
@@ -593,20 +595,19 @@ static void *run(void *targ)
 				else if (inst == 0xa) /* Decrement on REP */
 					--falseLoopDepth;
 			} else {
+				
+				ptr_shiftPtr = 
+				(inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf) * (ptr_shiftPtr) +
+				((inst == 0x0)*0)+
+				((inst == 0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS)))+
+				((inst == 0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
+
 
 				/*
 				* reg is called in 0x0, 0x3, 0x4, 0x5, 0x7, 0xc
 				* 
 				*/
 
-				/*
-				* ptr_shiftPtr
-				*/
-				ptr_shiftPtr = 
-				(inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0x9 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf) * (ptr_shiftPtr) +
-				((inst == 0x0)*0)+
-				((inst == 0x1)*((ptr_shiftPtr+4)*((ptr_shiftPtr+4)<SYSWORD_BITS)))+
-				((inst == 0x2)*(((ptr_shiftPtr==0)*SYSWORD_BITS)+ptr_shiftPtr-4));
 				/*
 				* ptr_wordPtr
 				* set in 0x0, 0x1, 0x2
@@ -618,7 +619,20 @@ static void *run(void *targ)
 				((inst == 0x1)*(((ptr_wordPtr*(ptr_shiftPtr!=0||((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS))+(ptr_shiftPtr==0)*((ptr_wordPtr+1)<POND_DEPTH_SYSWORDS)))))+
 				((inst == 0x2)*(((ptr_wordPtr==0&&ptr_shiftPtr==(SYSWORD_BITS-4))*(POND_DEPTH_SYSWORDS))+ptr_wordPtr-(ptr_shiftPtr==(SYSWORD_BITS-4))));
 
-				
+				wordPtr=
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5|| inst == 0x6 || inst==0x7||inst==0x8||inst==0x9||inst==0xb||inst==0xd||inst==0xe||inst==0xf)*(wordPtr)+
+                ((inst==0xa)*(wordPtr*!(reg&&loopStackPtr)+(loopStack_wordPtr[loopStackPtr-1]*(reg&&loopStackPtr))))+
+                ((inst==0xc)*(wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS))));
+
+				shiftPtr=
+				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5|| inst == 0x6 || inst==0x7||inst==0x8||inst==0x9||inst==0xb||inst==0xd||inst==0xe||inst==0xf)*(shiftPtr)+
+                ((inst==0xa)*(shiftPtr*!(reg&&loopStackPtr)+(loopStack_shiftPtr[loopStackPtr-1]*(reg&&loopStackPtr))))+
+                ((inst==0xc)*((shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4)));
+
+				/*
+                 * skip from 0xc 
+                 */
+                skip=(reg&&loopStackPtr)*(inst==0xa);
 
 				/*
 				* TODO: 0xc
@@ -667,7 +681,9 @@ static void *run(void *targ)
 				*/
 				currentWord=
 				(inst==0x0||inst==0x1||inst==0x2||inst==0x3||inst==0x4||inst==0x5||inst==0x7||inst==0x8||inst==0x9||inst == 0xa || inst==0xb|| inst == 0xc || inst==0xd||inst==0xe||inst==0xf)*(currentWord)+
-				((inst==0x6)*(pptr->genome[wordPtr]));
+				((inst==0x6)*(pptr->genome[wordPtr]))+
+				((inst==0xa)*(currentWord*!(reg&&loopStackPtr)+(pptr->genome[wordPtr])*(reg&&loopStackPtr)));
+
 				//((inst==0xa)*())
 				//((inst == 0xc)*(pptr->genome[wordPtr]));
 				
@@ -710,7 +726,8 @@ static void *run(void *targ)
 				*/
 				falseLoopDepth=
 				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(falseLoopDepth)+
-				((inst == 0x9)*(falseLoopDepth + (!reg)));
+				((inst == 0x9)*(falseLoopDepth + (!reg)))+
+				((inst == 0xa)*(loopStackPtr-!!loopStackPtr));
 
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
@@ -827,16 +844,16 @@ static void *run(void *targ)
                         break;
 
 					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
-						         if (loopStackPtr) {
-							--loopStackPtr;
-							if (reg) {
-								wordPtr = loopStack_wordPtr[loopStackPtr];
-								shiftPtr = loopStack_shiftPtr[loopStackPtr];
-								currentWord = pptr->genome[wordPtr];
+						   //      if (loopStackPtr) {
+						//	--loopStackPtr;
+						//	if (reg) {
+						//		wordPtr = loopStack_wordPtr[loopStackPtr];
+						//		shiftPtr = loopStack_shiftPtr[loopStackPtr];
+						//		currentWord = pptr->genome[wordPtr];
 								//This ensures that the LOOP is rerun 
-								continue;
-							}
-						}
+						//		continue;
+						//	}
+						//}
 						break;
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						//facing = reg & 3;
@@ -889,35 +906,29 @@ static void *run(void *targ)
 			
 			/* Advance the shift and word pointers, and loop around
 			 * to the beginning at the end of the genome. */
-			
 
             // increment wordptr by 1 if the shift Ptr is going to go
             // beyond the current word it is reading.
             // Set the wordptr to EXEC_START_WORD if the end of the
             // POND_DEPTH_SYSWORDS has been reached.
-            wordPtr=wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))+((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))+EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS));
+            wordPtr=(wordPtr*((shiftPtr+4<SYSWORD_BITS)||(wordPtr+1<POND_DEPTH_SYSWORDS))
+                +
+                ((shiftPtr+4>=SYSWORD_BITS)&&(wordPtr+1<POND_DEPTH_SYSWORDS))
+                +
+                EXEC_START_WORD*((wordPtr+1>=POND_DEPTH_SYSWORDS)&&(shiftPtr+4>=SYSWORD_BITS)))*!skip + wordPtr*skip;
 
             //currentWord gets incremented when the shiftptr is greater than
             //SYSWORD_BITS, and it's time to move to the next word
-            currentWord=currentWord*(shiftPtr+4<SYSWORD_BITS)+(pptr->genome[wordPtr])*(shiftPtr+4>=SYSWORD_BITS);
+            currentWord=(currentWord*(shiftPtr+4<SYSWORD_BITS)
+                +
+                (pptr->genome[wordPtr])*(shiftPtr+4>=SYSWORD_BITS))*!skip
+                + currentWord*skip;
             
             //shiftPtr shifts the current nibble being read by the machine
             //It incrememnts four bits until it gets past SYSWORD_BITS, the 
             //number of bits in a word, and then resets at either 0 or
             //EXEC_START_BIT
             shiftPtr=(shiftPtr+4)+(shiftPtr+4>=SYSWORD_BITS)*(-shiftPtr-4);
-                //+
-                //(EXEC_START_BIT)*(wordPtr+1>=POND_DEPTH_SYSWORDS)
-                //*(shiftPtr+4>=SYSWORD_BITS);
-            /*
-            if ((shiftPtr += 4) >= SYSWORD_BITS) {
-				if (++wordPtr >= POND_DEPTH_SYSWORDS) {
-					wordPtr = EXEC_START_WORD;
-					shiftPtr = EXEC_START_BIT;
-				} else shiftPtr = 0;
-				currentWord = pptr->genome[wordPtr];
-			}
-            */
         }   
 
 		/* Copy outputBuf into neighbor if access is permitted and there
