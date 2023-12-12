@@ -94,7 +94,7 @@ int main() {
 
     uintptr_t numrollback = getRandomRollback(1);   // match numroll
     uintptr_t numrollback2 = getRandomRollback(0); // nothing
-    uintptr_t numrollback3 = getRandomRollback(1);  // match numroll2
+    uintptr_t numrollback3 = getRandomRollback(0);  // match numroll2
     uintptr_t numrollback4 = getRandomRollback(1);  // match numroll3 
     
     uintptr_t numroll = getRandomPreOG();   // one number
