@@ -867,7 +867,7 @@ static void *run(void *targ)
 		if ((outputBuf[0] & 0xff) != 0xff) {
 			tmpptr = getNeighbor(x,y,facing);
 
-			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0, 1)) {
+			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0, !(tmpptr->energy))) {
 				/* Log it if we're replacing a viable cell */
 				if (tmpptr->generation > 2)
 					++statCounters.viableCellsReplaced;
