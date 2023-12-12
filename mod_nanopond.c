@@ -272,15 +272,15 @@ static uintptr_t last_random_number;
 
 volatile uint64_t prngState[2];
 
-static inline uintptr_t getRandomPre()
+static inline uintptr_t getRandomPre(int rollback)
 {
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
 	uint64_t x = prngState[0];
 	const uint64_t y = prngState[1];
-	prngState[0] = y;
+	prngState[0] = prngState[0] * !rollback + rollback * y;
 	x ^= x << 23;
 	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
-	prngState[1] = z;
+	prngState[1] = prngState[1] * !rollback + rollback * z;
 	return (uintptr_t)(z + y);
 }
 void precalculate_random_numbers() {
@@ -288,6 +288,7 @@ void precalculate_random_numbers() {
         buffer[i] = getRandomPre();
     }
 }
+/*
 static inline uintptr_t getRandom() {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
@@ -295,12 +296,13 @@ static inline uintptr_t getRandom() {
     in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
 }
+*/
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-    uintptr_t new_num = getRandomPre();
-    buffer[in] = (new_num & -rollback) | (num & ~-rollback);  // Generate a new random number only if rollback is not zero
-    in = ((in + 1) & -rollback) | (in & ~-rollback);  // Roll back if rollback is zero
+    uintptr_t new_num = getRandomPre(rollback);
+    buffer[in] = (new_num & -rollback) | (num & ~-rollback);
+    in = ((in + 1) & -rollback) | (in & ~-rollback);
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
