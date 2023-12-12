@@ -17,10 +17,10 @@ static inline uintptr_t getRandomPreOG()
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
 	uint64_t x = prngStateOG[0];
 	const uint64_t y = prngStateOG[1];
-	prngState[0] = y;
+	prngStateOG[0] = y;
 	x ^= x << 23;
 	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
-	prngState[1] = z;
+	prngStateOG[1] = z;
 	return (uintptr_t)(z + y);
 }
 static inline uintptr_t getRandomPre()
