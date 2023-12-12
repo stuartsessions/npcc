@@ -54,7 +54,8 @@ int main() {
     uintptr_t numrollback = getRandomRollback(1);  
     
     uintptr_t numroll = getRandomRollback(0);  
-    uintptr_t numrollback = getRandomRollback(1);  
+    
+    numrollback = getRandomRollback(1);  
         //uintptr_t numpre = getRandomPre();
         //uintptr_t num = getRandom();
     printf("numroll: %lu, numrollback: %lu\n", numroll, numrollback);
