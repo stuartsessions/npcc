@@ -45,7 +45,7 @@ static inline uintptr_t getRandomRollback(uintptr_t rollback) {
 
 int main() {
     // Initialize the PRNG state
-    prngState[0] = time(NULL);
+    prngState[0] = 13;
     prngState[1] = 0xDEADBEEF;
 
     // Precalculate random numbers
@@ -53,9 +53,11 @@ int main() {
 
     for (int i = 0; i < 2000; ++i) {
         uintptr_t numrollback = getRandomRollback(1);  
-        uintptr_t numpre = getRandomPre();
-        uintptr_t num = getRandom();
+        //uintptr_t numpre = getRandomPre();
+        //uintptr_t num = getRandom();
         print("num: %lu, numpre: %lu, numrollback: %lu\n", num, numpre, numrollback);
     }
+
+    
     return 0;
 }
