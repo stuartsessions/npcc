@@ -827,7 +827,6 @@ static void *run(void *targ)
                         break;
 
 					case 0xa: /* REP: Jump back to matching LOOP if register is nonzero */
-                           /*
 						         if (loopStackPtr) {
 							--loopStackPtr;
 							if (reg) {
@@ -838,12 +837,6 @@ static void *run(void *targ)
 								continue;
 							}
 						}
-						*/
-						loopStackPtr = loopStackPtr * (loopStackPtr > 0);
-						wordPtr = wordPtr * (!reg || loopStackPtr <= 0) + loopStack_wordPtr[loopStackPtr - 1] * (reg && loopStackPtr > 0);
-						shiftPtr = shiftPtr * (!reg || loopStackPtr <= 0) + loopStack_shiftPtr[loopStackPtr - 1] * (reg && loopStackPtr > 0);
-						currentWord = currentWord * (!reg || loopStackPtr <= 0) + pptr->genome[wordPtr] * (reg && loopStackPtr > 0);
-						loopStackPtr -= (loopStackPtr > 0);
 						break;
 					case 0xb: /* TURN: Turn in the direction specified by register */
 						//facing = reg & 3;
