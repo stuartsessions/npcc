@@ -265,9 +265,14 @@
 #include <string.h>
 #include <time.h>
 
+#define BUFFER_SIZE 1000  // Size of the circular buffer
+static uintptr_t buffer[BUFFER_SIZE];
+static int in = 0;
+static uintptr_t last_random_number;
+
 
 volatile uint64_t prngState[2];
-static inline uintptr_t getRandom()
+static inline uintptr_t getRandomPre()
 {
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
 	uint64_t x = prngState[0];
@@ -279,6 +284,19 @@ static inline uintptr_t getRandom()
 	return (uintptr_t)(z + y);
 }
 
+void precalculate_random_numbers() {
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        buffer[i] = getRandomPre();
+    }
+}
+
+static inline uintptr_t getRandom() {
+    uintptr_t num = buffer[in];
+    last_random_number = num;  // Store the last random number
+	buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
+    in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
+    return num;
+}
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
  * by two is due to the fact that there are two four-bit values in
@@ -432,28 +450,10 @@ static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, con
     return &pond[newX][newY];
 }
 
-static inline int accessAllowed(struct Cell *const c2,const uintptr_t c1guess,int sense)
+static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
 {
-	/* Access permission is more probable if they are more similar in sense 0,
-	 * and more probable if they are different in sense 1. Sense 0 is used for
-	 * "negative" interactions and sense 1 for "positive" ones. */
-/*	
-	return !!sense * (
-            (
-             (getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) 
-             ^ 
-             (c1guess & 0xf)])
-            ||(!c2->parentID)
-            ) 
-        +
-       !sense * (
-                ((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])
-                ||(!c2->parentID));
-
-  */
-    
-    return sense ? (((getRandom() & 0xf) >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID)) : (((getRandom() & 0xf) <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)])||(!c2->parentID));
-
+    uintptr_t random = (uintptr_t)(getRandom() & 0xf);
+    return ((((random >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & sense) | (((random <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & ~sense));
 }
 
 volatile int exitNow = 0;
@@ -955,12 +955,15 @@ static void *run(void *targ)
  */
 int main()
 {
+
 	uintptr_t i,x,y;
 
 	/* Seed and init the random number generator */
 	prngState[0] = 0; //(uint64_t)time(NULL);
 	srand(13);
 	prngState[1] = (uint64_t)rand();
+	
+	precalculate_random_numbers();
 
 	/* Reset per-report stat counters */
 	for(x=0;x<sizeof(statCounters);++x)
