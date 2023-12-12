@@ -37,7 +37,7 @@ static inline uintptr_t getRandom() {
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-    buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
+    buffer[in] = getRandomPre() * rollback + num * (!rollback);  // Generate a new random number only if rollback is not zero
     in = ((in + 1) % BUFFER_SIZE) * rollback + in * (!rollback);  // Roll back if rollback is zero
     return num;
 }
