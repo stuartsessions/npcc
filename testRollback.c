@@ -50,7 +50,7 @@ static inline uintptr_t getRandom() {
     return num;
 }
 */
-
+/*
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
@@ -59,6 +59,16 @@ static inline uintptr_t getRandomRollback(uintptr_t rollback) {
 
     in = ((in + 1) % BUFFER_SIZE) * rollback + in * (!rollback);  // Roll back if rollback is zero
     
+    return num;
+}
+*/
+
+static inline uintptr_t getRandomRollback(uintptr_t rollback) {
+    uintptr_t num = buffer[in];
+    last_random_number = num;  // Store the last random number
+    uintptr_t new_num = getRandomPre(rollback);
+    buffer[in] = (new_num & -rollback) | (num & ~-rollback);
+    in = ((in + 1) & -rollback) | (in & ~-rollback);
     return num;
 }
 
