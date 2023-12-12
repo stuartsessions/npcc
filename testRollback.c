@@ -60,31 +60,15 @@ int main() {
     // Precalculate random numbers
     precalculate_random_numbers();
 
-    // Get a random number without rollback
-    uintptr_t num1 = getRandomRollback(1);
-    printf("Random number without rollback: %lu\n", num1);
-
-    // Get a random number with rollback
-    uintptr_t num2 = getRandomRollback(0);
-    printf("Random number with rollback: %lu\n", num2);
-
-    // Check if the random number with rollback is the same as the previous number
-    if (num2 == num1) {
-        printf("Rollback works correctly\n");
-    } else {
-        printf("Rollback does not work correctly\n");
-    }
-
-    // Get another random number without rollback
-    uintptr_t num3 = getRandomRollback(1);
-    printf("Another random number without rollback: %lu\n", num3);
-
-    // Check if the new random number is different from the previous numbers
-    if (num3 != num1 && num3 != num2) {
-        printf("Random number generation works correctly\n");
-    } else {
-        printf("Random number generation does not work correctly\n");
-    }
+    for (int i = 0; i < 10000; ++i) {
+        uintptr_t num = getRandom();
+        uintptr_t num1 = getRandomRollback(0);
+        if (num2 == num1) {
+            printf("%lu = %luy\n", num, num1);
+            } 
+        else {
+            printf("Rollback does not work correctly\n");
+            }
 
     return 0;
 }
