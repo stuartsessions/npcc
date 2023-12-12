@@ -452,8 +452,8 @@ static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, con
 
 static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
 {
-    int random = getRandom() & 0xf;
-    return (((random >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & sense | ((random <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & ~sense);
+    uintptr_t random = (uintptr_t)(getRandom() & 0xf);
+    return ((((random >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & sense) | (((random <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & ~sense));
 }
 
 volatile int exitNow = 0;
