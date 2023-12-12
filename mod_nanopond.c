@@ -267,7 +267,7 @@
 
 #define BUFFER_SIZE 1000  // Size of the circular buffer
 static uintptr_t buffer[BUFFER_SIZE];
-static int index = 0;
+static int in = 0;
 static uintptr_t last_random_number;
 
 
@@ -291,10 +291,10 @@ void precalculate_random_numbers() {
 }
 
 static inline uintptr_t getRandom() {
-    buffer[index] = getRandomPre();  // Generate a new random number and add it to the buffer
-    uintptr_t num = buffer[index];
+    buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
+    uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-    index = (index + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
+    in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
