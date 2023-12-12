@@ -66,10 +66,10 @@ int main() {
     // Precalculate random numbers
     precalculate_random_numbers();
 
-    uintptr_t numrollback = getRandomRollback(1);   // one number
-    uintptr_t numrollback2 = getRandomRollback(1); // two number
-    uintptr_t numrollback3 = getRandomRollback(0);  // go back one 
-    uintptr_t numrollback4 = getRandomRollback(1);  // go back one 
+    uintptr_t numrollback = getRandomRollback(0);   // one number
+    uintptr_t numrollback2 = getRandomRollback(0); // two number
+    uintptr_t numrollback3 = getRandomRollback(1);  // go back one 
+    uintptr_t numrollback4 = getRandomRollback(0);  // go back one 
     
     uintptr_t numroll = getRandomPreOG();   // one number
     uintptr_t numroll2 = getRandomPreOG();   //two number
@@ -77,7 +77,7 @@ int main() {
     
 
     printf("numrollback: %lu, numrollback2: %lu, numrollback3 = %lu, numrollback4 = %lu\n", numrollback, numrollback2, numrollback3, numrollback4);
-    printf("numroll: %lu, numroll2: %lu, numrollback3 = %lu\n", numroll, numroll2, numroll3);
+    printf("numroll: %lu, numroll2: %lu, numroll3 = %lu\n", numroll, numroll2, numroll3);
 
     
 
