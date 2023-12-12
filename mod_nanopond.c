@@ -265,7 +265,7 @@
 #include <string.h>
 #include <time.h>
 
-#define PRECALC_NUMS 1000000000  // Number of precalculated numbers
+#define PRECALC_NUMS 1000000 // Number of precalculated numbers
 static uintptr_t precalc_random_nums[PRECALC_NUMS];
 static int random_idx = 0;
 
@@ -289,6 +289,9 @@ void precalculate_random_numbers() {
     random_idx = 0;  // Reset the index
 }
 static inline uintptr_t getRandom() {
+	if (random_idx == PRECALC_NUMS) {
+		precalculate_random_numbers();
+	}
     uintptr_t num = precalc_random_nums[random_idx];
     random_idx = (random_idx + 1);
     return num;
