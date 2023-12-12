@@ -698,6 +698,15 @@ static void *run(void *targ)
 				((inst == 0x9) * (loopStack_shiftPtr[loopStackPtr]*(!reg||(loopStackPtr>=POND_DEPTH))+(shiftPtr*(reg&&(loopStackPtr<POND_DEPTH)))));
 				
 				/*
+				* falseLoopDepth
+				* set in 0x9,
+				*/
+				falseLoopDepth=
+				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(falseLoopDepth)+
+				((inst == 0x9)*(falseLoopDepth + (!reg)));
+
+
+				/*
 				* loopStackPtr
 				* set in 0x9
 				*/
@@ -705,13 +714,7 @@ static void *run(void *targ)
 				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(loopStackPtr)+
 				((inst == 0x9)*(loopStackPtr + (reg&&(loopStackPtr<POND_DEPTH))));
 				
-				/*
-				* falseLoopDepth
-				* set in 0x9,
-				*/
-				falseLoopDepth=
-				(inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(falseLoopDepth)+
-				((inst == 0x9)*(falseLoopDepth + (!reg)));
+
 
 				/* Keep track of execution frequencies for each instruction */
 				statCounters.instructionExecutions[inst] += 1.0;
