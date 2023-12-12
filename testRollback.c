@@ -57,7 +57,7 @@ int main() {
     for (int i = 0; i < 10000; ++i) {
         uintptr_t num = getRandom();
         uintptr_t num1 = getRandomRollback(0);
-        if (num2 == num1) {
+        if (num == num1) {
             printf("%lu = %luy\n", num, num1);
             } 
         else {
