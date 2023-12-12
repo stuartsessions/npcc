@@ -49,8 +49,8 @@ static inline uintptr_t getRandom() {
 static inline uintptr_t getRandomRollback(uintptr_t rollback) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-    buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
     in = ((in + 1) % BUFFER_SIZE) * rollback + in * (!rollback);  // Roll back if rollback is zero
+    buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
     return num;
 }
 
@@ -66,10 +66,10 @@ int main() {
     // Precalculate random numbers
     precalculate_random_numbers();
 
-    uintptr_t numrollback = getRandomRollback(1);   // one number
-    uintptr_t numrollback2 = getRandomRollback(0); // two number
-    uintptr_t numrollback3 = getRandomRollback(1);  // go back one 
-    uintptr_t numrollback4 = getRandomRollback(1);  // go back one 
+    uintptr_t numrollback = getRandomRollback(1);   // match numroll
+    uintptr_t numrollback2 = getRandomRollback(0); // nothing
+    uintptr_t numrollback3 = getRandomRollback(1);  // match numroll2
+    uintptr_t numrollback4 = getRandomRollback(1);  // match numroll3 
     
     uintptr_t numroll = getRandomPreOG();   // one number
     uintptr_t numroll2 = getRandomPreOG();   //two number
