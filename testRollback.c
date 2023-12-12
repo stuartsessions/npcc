@@ -86,10 +86,11 @@ int main() {
     uintptr_t numroll = getRandomPreOG();   // one number
     uintptr_t numroll2 = getRandomPreOG();   //two number
     uintptr_t numroll3 = getRandomPreOG();   //three number
-    
+    uintptr_t numroll4 = getRandomPreOG();   //four number
+
 
     printf("numrollback: %lu, numrollback2: %lu, numrollback3 = %lu, numrollback4 = %lu\n", numrollback, numrollback2, numrollback3, numrollback4);
-    printf("numroll: %lu, numroll2: %lu, numroll3 = %lu\n", numroll, numroll2, numroll3);
+    printf("numroll: %lu, numroll2: %lu, numroll3 = %lu, numroll4 = %lu\n", numroll, numroll2, numroll3, numroll4);
 
     
 
