@@ -27,8 +27,10 @@ static inline uintptr_t getRandomPre()
     pre_buffer[pre_in] = num;
     pre_in = (pre_in + 1) % BUFFER_SIZE;
 
+    uintptr_t num = (uintptr_t)(z + y);
 
-	return (uintptr_t)(z + y);
+
+	return num;
 }
 void precalculate_random_numbers() {
     for (int i = 0; i < BUFFER_SIZE; i++) {
