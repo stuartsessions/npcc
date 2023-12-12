@@ -272,29 +272,36 @@ static uintptr_t last_random_number;
 
 
 volatile uint64_t prngState[2];
-static inline uintptr_t getRandomPre()
+static inline uintptr_t getRandomPre(int rollback)
 {
-	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
-	uint64_t x = prngState[0];
-	const uint64_t y = prngState[1];
-	prngState[0] = y;
-	x ^= x << 23;
-	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
-	prngState[1] = z;
-	return (uintptr_t)(z + y);
+    // https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
+    uint64_t x = prngState[0];
+    const uint64_t y = prngState[1];
+    prngState[0] = prngState[0] * rollback + !rollback * y; 
+    x ^= x << 23;
+    const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26); 
+    prngState[1] = prngState[1] * rollback + !rollback * z; 
+    return (uintptr_t)(z + y);
 }
 
 void precalculate_random_numbers() {
     for (int i = 0; i < BUFFER_SIZE; i++) {
-        buffer[i] = getRandomPre();
+        buffer[i] = getRandomPre(1);
     }
 }
 
 static inline uintptr_t getRandom() {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
-	buffer[in] = getRandomPre();  // Generate a new random number and add it to the buffer
+	buffer[in] = getRandomPre(1);  // Generate a new random number and add it to the buffer
     in = (in + 1) % BUFFER_SIZE;  // Wrap around to 0 when index reaches BUFFER_SIZE
+    return num;
+}
+static inline uintptr_t getRandomRollback(uintptr_t rollback) {
+    uintptr_t num = buffer[in];
+    last_random_number = num;  // Store the last random number
+    buffer[in] = getRandomPre(rollback);  // Generate a new random number and add it to the buffer
+    in = ((in + 1) % BUFFER_SIZE) * rollback + in * (!rollback);  // Roll back if rollback is zero
     return num;
 }
 /* Pond depth in machine-size words.  This is calculated from
@@ -450,10 +457,10 @@ static inline struct Cell *getNeighbor(const uintptr_t x, const uintptr_t y, con
     return &pond[newX][newY];
 }
 
-static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense)
+static inline int accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense, uintptr_t rollback)
 {
-    uintptr_t random = (uintptr_t)(getRandom() & 0xf);
-    return ((((random >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & sense) | (((random <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & ~sense));
+    uintptr_t random = (uintptr_t)(getRandomRollback(rollback) & 0xf);
+    return (rollback && (((random >= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & sense) | (((random <= BITS_IN_FOURBIT_WORD[(c2->genome[0] & 0xf) ^ (c1guess & 0xf)]) || !c2->parentID) & ~sense));
 }
 /*
 static inline int accessAllowedSwitch(struct Cell *const c2, const uintptr_t c1guess, int sense)
@@ -780,7 +787,7 @@ static void *run(void *targ)
 						break;
 					case 0xd: /* KILL: Blow away neighboring cell if allowed with penalty on failure */
 						tmpptr = getNeighbor(x,y,facing);
-						int access_var = accessAllowed(tmpptr,reg,0);
+						int access_var = accessAllowed(tmpptr,reg,0, 1);
                         statCounters.viableCellsKilled=statCounters.viableCellsKilled+(access_var)*(tmpptr->generation>2);
                         tmpptr->genome[0] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
                         tmpptr->genome[1] = tmpptr->genome[0]*!(access_var)+(access_var)*~((uintptr_t)0);
@@ -794,7 +801,7 @@ static void *run(void *targ)
                         break;
 					case 0xe: /* SHARE: Equalize energy between self and neighbor if allowed */
 						tmpptr = getNeighbor(x,y,facing);
-						int access = accessAllowed(tmpptr,reg,1);
+						int access = accessAllowed(tmpptr,reg,1, 1);
 						tmp = pptr->energy + tmpptr->energy;
 						statCounters.viableCellShares += access * (tmpptr->generation > 2);
 						tmpptr->energy = (access * (tmp / 2) + (1 - access) * tmpptr->energy);
@@ -854,7 +861,7 @@ static void *run(void *targ)
 		if ((outputBuf[0] & 0xff) != 0xff) {
 			tmpptr = getNeighbor(x,y,facing);
 
-			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0)) {
+			if ((tmpptr->energy)&&accessAllowed(tmpptr,reg,0, 1)) {
 				/* Log it if we're replacing a viable cell */
 				if (tmpptr->generation > 2)
 					++statCounters.viableCellsReplaced;
