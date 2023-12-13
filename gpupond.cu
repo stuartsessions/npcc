@@ -264,15 +264,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <cuda.h>
 
 #define BUFFER_SIZE 1000  // Size of the circular buffer
-static uintptr_t buffer[BUFFER_SIZE];
+__managed__ uintptr_t buffer[BUFFER_SIZE];
 static int in = 0;
 static uintptr_t last_random_number;
 
-volatile uint64_t prngState[2];
+__managed__ volatile uint64_t prngState[2];
 
-static inline uintptr_t getRandomPre(int rollback)
+__device__ void getRandomPre(int rollback, uintptr_t &ret)
 {
 	// https://en.wikipedia.org/wiki/Xorshift#xorshift.2B
 	uint64_t x = prngState[0];
@@ -281,20 +282,20 @@ static inline uintptr_t getRandomPre(int rollback)
 	x ^= x << 23;
 	const uint64_t z = x ^ y ^ (x >> 17) ^ (y >> 26);
 	prngState[1] = prngState[1] * !rollback + rollback * z;
-	return (uintptr_t)(z + y);
+	ret = (uintptr_t)(z + y);
 }
-void precalculate_random_numbers() {
+__global__ void precalculate_random_numbers() {
     for (int i = 0; i < BUFFER_SIZE; i++) {
         buffer[i] = getRandomPre(1);
     }
 }
-static inline uintptr_t getRandomRollback(uintptr_t rollback) {
+__device__ uintptr_t getRandomRollback(uintptr_t rollback, int &ret) {
     uintptr_t num = buffer[in];
     last_random_number = num;  // Store the last random number
     uintptr_t new_num = getRandomPre(rollback);
     buffer[in] = (new_num & -rollback) | (num & ~-rollback);
     in = (((in + 1) & -rollback) | (in & ~-rollback)) % BUFFER_SIZE;
-    return num;
+    ret = num;
 }
 /* Pond depth in machine-size words.  This is calculated from
  * POND_DEPTH and the size of the machine word. (The multiplication
