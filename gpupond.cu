@@ -723,6 +723,8 @@ __global__ void kernel_sim(uintptr_t *clock)
             falseLoopDepth=
             (inst == 0x0 || inst == 0x1 || inst == 0x2 || inst == 0x3 || inst == 0x4 || inst == 0x5 || inst == 0x6 || inst == 0x7 || inst == 0x8 || inst == 0xa || inst == 0xb || inst == 0xc || inst == 0xd || inst == 0xe || inst == 0xf)*(falseLoopDepth)+
             ((inst == 0x9)*(falseLoopDepth + (!reg)));
+            
+            
             /*
             * tmpptr
             * set is 0xd, 0xe
