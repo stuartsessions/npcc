@@ -284,11 +284,13 @@ __host__ __device__ void getRandomPre(int rollback, uintptr_t *ret)
 	prngState[1] = prngState[1] * !rollback + rollback * z;
 	*ret = (uintptr_t)(z + y);
 }
-void precalculate_random_numbers() {
+void precalculate_random_numbers() 
+{
     for (int i = 0; i < BUFFER_SIZE; i++) {
         uintptr_t ret;
         getRandomPre(1,&ret);
         buffer[i] = ret;
+        printf("buff[i]=%lu\n",buffer[i]);
     }
 }
 __device__ void getRandomRollback(uintptr_t rollback, uintptr_t *ret) {
@@ -354,7 +356,15 @@ struct Cell
 };
 
 /* The pond is a 2D array of cells */
-__managed__ struct Cell pond[POND_SIZE_X][POND_SIZE_Y];
+__managed__ struct Cell pond[POND_SIZE_X*POND_SIZE_Y];
+
+/* Refactor sets and gets to:
+
+       * struct Cell cell = d_pond[y * POND_SIZE_X + x];
+
+           * d_pond[y * POND_SIZE_X + x] = cell;
+
+*/
 
 /* This is used to generate unique cell IDs */
 __managed__ uint64_t cellIdCounter = 0;
@@ -390,7 +400,7 @@ static void doReport(const uint64_t clock)
 	
 	for(x=0;x<POND_SIZE_X;++x) {
 		for(y=0;y<POND_SIZE_Y;++y) {
-			struct Cell *const c = &pond[x][y];
+			struct Cell *const c = &pond[y*POND_SIZE_X+x];
 			if (c->energy) {
 				++totalActiveCells;
 				totalEnergy += (uint64_t)c->energy;
@@ -449,8 +459,9 @@ __device__ void getNeighbor(const uintptr_t x, const uintptr_t y, const uintptr_
     /* Calculate the new coordinates */
     uintptr_t newX = (x + dx[dir] + POND_SIZE_X) % POND_SIZE_X;
     uintptr_t newY = (y + dy[dir] + POND_SIZE_Y) % POND_SIZE_Y;
-
-    retptr = &pond[newX][newY];
+    
+    retptr = &pond[newY*POND_SIZE_X + newX];
+    
 }
 
 __device__ void accessAllowed(struct Cell *const c2, const uintptr_t c1guess, int sense, int rollback, int *ret)
@@ -473,7 +484,6 @@ __global__ void kernel_sim(uintptr_t *clock)
     // To run doReport, the CPU needs to know the clock value,
     // as well as the pond and statCounter.
     // pond either needs to be memCpyed back or managed.
-    
     
 	uintptr_t x,y,i;
 
@@ -510,13 +520,15 @@ __global__ void kernel_sim(uintptr_t *clock)
 	/* If this is nonzero, cell execution stops. This allows us
 	 * to avoid the ugly use of a goto to exit the loop. :) */
 	int stop;
-   
     if (!(*clock % INFLOW_FREQUENCY)) {
         getRandomRollback(1,&x);
         x = x % POND_SIZE_X;
+        //printf("x= %lu\n",x);
         getRandomRollback(1,&y);
         y = y % POND_SIZE_Y;
-        pptr = &pond[x][y];
+        //printf("y= %lu\n",x);
+        pptr = &pond[y*POND_SIZE_X + x];
+        //printf("pptr= %#p\n",pptr);
         pptr->ID = cellIdCounter;
         pptr->parentID = 0;
         pptr->lineage = cellIdCounter;
@@ -527,9 +539,13 @@ __global__ void kernel_sim(uintptr_t *clock)
 #else
         pptr->energy += INFLOW_RATE_BASE;
 #endif /* INFLOW_RATE_VARIATION */
+        //printf("energy added: %d\n",pptr->energy);
+        //printf("Genome:");
         for(i=0;i<POND_DEPTH_SYSWORDS;++i) 
             getRandomRollback(1,&ret);
+            printf("%lu",ret);
             pptr->genome[i] = ret;
+        printf("\n");
         ++cellIdCounter;
     
     }
@@ -538,8 +554,7 @@ __global__ void kernel_sim(uintptr_t *clock)
     getRandomRollback(1,&i);
     x = i % POND_SIZE_X;
     y = ((i / POND_SIZE_X) >> 1) % POND_SIZE_Y;
-    pptr = &pond[x][y];
-
+    pptr = &pond[y*POND_SIZE_X + x];
     /* Reset the state of the VM prior to execution */
     for(i=0;i<POND_DEPTH_SYSWORDS;++i)
         outputBuf[i] = ~((uintptr_t)0); /* ~0 == 0xfffff... */
@@ -563,14 +578,15 @@ __global__ void kernel_sim(uintptr_t *clock)
      * whenever it might have changed... take a look at
      * the code. :) */
     currentWord = pptr->genome[0];
-
+    //printf("Currentword: %lu\n",pptr->genome[0]);
     /* Keep track of how many cells have been executed */
     statCounters.cellExecutions += 1.0;
-
+    //printf("cellExecutions: %f\n",statCounters.cellExecutions);
     /* Core execution loop */
     while ((pptr->energy)&&(!stop)) {
         /* Get the next instruction */
         inst = (currentWord >> shiftPtr) & 0xf;
+        printf("inst= %d\n",inst);
         skip=0;
 
         /* Randomly frob either the instruction or the register with a
@@ -606,6 +622,7 @@ __global__ void kernel_sim(uintptr_t *clock)
             else if (inst == 0xa) /* Decrement on REP */
                 --falseLoopDepth;
         } else {
+            printf("made it to the instruction reader\n");
             /*
             * ptr_shiftPtr
             */
@@ -730,6 +747,7 @@ __global__ void kernel_sim(uintptr_t *clock)
             * set is 0xd, 0xe
             */ 
             getNeighbor(x,y,facing,tmpptr);
+
             access_neg_used = 0;
             access_pos_used = 0;
             
@@ -913,7 +931,6 @@ static void *run()
         
         kernel_sim<<<1,1>>>(clock);
         cudaDeviceSynchronize();
-        
         /* Increment clock and run reports periodically */
 		/* Clock is incremented at the start, so it starts at 1 */
 	}
@@ -937,8 +954,12 @@ int main()
 	srand(13);
 	prngState[1] = (uint64_t)rand();
 	precalculate_random_numbers();
-
-	/* Reset per-report stat counters */
+/*
+    for(int i=0;i<sizeof(buffer);i++)
+    {
+        printf("Buffer val is %lu\n",buffer[i]);
+    }
+*/	/* Reset per-report stat counters */
 	for(x=0;x<sizeof(statCounters);++x)
 		((uint8_t *)&statCounters)[x] = (uint8_t)0;
  
@@ -946,13 +967,13 @@ int main()
 	 * to 0xffff... */
 	for(x=0;x<POND_SIZE_X;++x) {
 		for(y=0;y<POND_SIZE_Y;++y) {
-			pond[x][y].ID = 0;
-			pond[x][y].parentID = 0;
-			pond[x][y].lineage = 0;
-			pond[x][y].generation = 0;
-			pond[x][y].energy = 0;
+			pond[y*POND_SIZE_X + x].ID = 0;
+			pond[y*POND_SIZE_X + x].parentID = 0;
+			pond[y*POND_SIZE_X + x].lineage = 0;
+			pond[y*POND_SIZE_X + x].generation = 0;
+			pond[y*POND_SIZE_X + x].energy = 0;
 			for(i=0;i<POND_DEPTH_SYSWORDS;++i)
-				pond[x][y].genome[i] = ~((uintptr_t)0);
+				pond[y*POND_SIZE_X + x].genome[i] = ~((uintptr_t)0);
 		}	
 	}		
 	run();

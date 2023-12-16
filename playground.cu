@@ -2,28 +2,22 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <cuda.h>
+__managed__ uintptr_t buffer[1000];
 
-__global__ void add(uintptr_t* clock)
+__global__ void add()
 {
-    ++clock;
-    if(clock==10)
-        printf("success");
-
+    for(int i=0;i<1000;i++)
+    {
+        buffer[i]=(uintptr_t)i;
+    }
 }
 
 int main(int argc, char** argv)
 {
-    uintptr_t iters;
-    uintptr_t* d_iters;
-    iters = 0;
-    cudaMalloc(&d_iters,sizeof(uintptr_t));
-    cudaMemcpy(d_iters,&iters,sizeof(uintptr_t),cudaMemcpyHostToDevice);
-    for(int i=0;i<10;i++)
+    add<<<1,1>>>();
+    for(int i=0;i<1000;i++)
     {
-        
-        add<<<1,1>>>(*d_iters);
-        cudaMemcpy(iters,d_iters,sizeof(uintptr_t)
+        printf("%lu",buffer[i]);
     }
-    
     return 0;
 }
